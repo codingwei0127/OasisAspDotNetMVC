@@ -1,0 +1,593 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12 ml-auto mr-auto">
+        <div class="page-categories">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 col-sm-3">
+                    @*<h4 class="card-title" id="EnergyDirection_title" style="font-weight:bold;">能源流向</h4>*@
+                </div>
+                <ul class="nav nav-pills nav-pills-info nav-pills-icons justify-content-center" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#Building" role="tablist" style="font-weight:bold;">
+                            <i class="material-icons">home_work</i> 建築能源流向
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " data-toggle="tab" href="#HVAC" role="tablist" style="font-weight:bold;">
+                            <i class="material-icons">air</i> 空調能源流向
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content tab-space tab-subcategories">
+                <div class="tab-pane active" id="Building">
+                    @*<div class="row">
+                            <label class="col-md-4">
+                                VCB1-11 包含 冰機1號、冰機備用機、冰機3號、冰機4號。
+                            </label>
+                            <label class="col-md-5">
+                                MP1-21 包含 照明、消防、鐵捲門、加壓泵、汙水泵、排風扇、電梯、中央監控電盤。
+                            </label>
+                            <label class="col-md-3">
+                                MP2-21 包含 冰水泵、冷卻水泵、區域泵、熱泵、水塔。
+                            </label>
+                        </div>*@
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card" style="background-color:#ffffff;">
+                                <div class="card-header card-header-icon card-header-info">
+                                    <h4 class="card-title" id="BuildingYear_title" style="font-weight:bold;color:#036EB7">電力系統年度能源流向分析</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        &nbsp;&nbsp;&nbsp;
+                                        <div class="input-group col-md-4" id="BuildingYDiv"></div>
+                                        @*@Html.DropDownList("BuildingYear", new List<SelectListItem>()
+                                            {
+                                                new SelectListItem(){ Text= "請選擇年份", Value = "0", Disabled = true},
+                                            }
+                                            , htmlAttributes: new { @class = "selectpicker", @data_style = "btn btn-info", @data_size = "8", @title = "請選擇年份" })*@
+                                        <button onclick="EnergyDirectionSearch('Building_Y')" id="BuildingSelectY" type="button" class="btn btn-fill btn-warning" style="font-weight:bold;">查詢</button>
+                                    </div>
+                                    <div id="BuildingYearDIV" style="display:none">
+                                        <br />
+                                        <div class="row" id="BYbtnDiv">
+                                            <label class="col-md-3"></label>
+                                            <button onclick="BY(0)" name="BYbtn" id="BY_0" type="button" class="btn-sm EMSdata" style="background-color:#003049;border:2px solid #003049;outline:none;color:white;">VCB1</button>&nbsp;&nbsp;
+                                            <button onclick="BY(1)" name="BYbtn" id="BY_1" type="button" class="btn-sm EMSdata" style="background-color:#D62828;border:2px solid #D62828;outline:none;color:white;">VCB2</button>&nbsp;&nbsp;
+                                            <button onclick="BY(2)" name="BYbtn" id="BY_2" type="button" class="btn-sm EMSdata" style="background-color:#F77F00;border:2px solid #F77F00;outline:none;color:white;">VCB3</button>&nbsp;&nbsp;
+                                            <button onclick="BY(3)" name="BYbtn" id="BY_3" type="button" class="btn-sm EMSdata" style="background-color:#FCBF49;border:2px solid #FCBF49;outline:none;color:white;">VCB4</button>&nbsp;&nbsp;
+                                            <button onclick="BY(4)" name="BYbtn" id="BY_4" type="button" class="btn-sm EMSdata" style="background-color:#94d2bd;border:2px solid #94d2bd;outline:none;color:white;">其他</button>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <label class="col-md-1"></label>
+                                            <div class="chart-container col-md-10" id="BuildingYChartDIV">
+                                                <div id="BuildingYChart"></div>
+                                            </div>
+                                        </div>
+                                        <table style="width:100%;font-weight:bold;">
+                                            <tbody>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">建物總用電度數</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelY" id="BuildingYear_Total" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;">VCB1</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelY" id="BuildingYear_VCB1" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">VCB2</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelY" id="BuildingYear_VCB2" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;">VCB3</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelY" id="BuildingYear_VCB3" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">VCB4</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelY" id="BuildingYear_VCB4" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;">其他</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelY" id="BuildingYear_Others" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card" style="background-color:#ffffff;">
+                                <div class="card-header card-header-icon card-header-info">
+                                    <h4 class="card-title" id="BuildingMonth_title" style="font-weight:bold;color:#79beed">電力系統單月能源流向分析</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        &nbsp;&nbsp;&nbsp;
+                                        <div class="input-group col-md-4" id="BuildingMDiv"></div>
+                                        <button onclick="EnergyDirectionSearch('Building_M')" id="BuildingSelectM" type="button" class="btn btn-fill btn-warning" style="font-weight:bold;">查詢</button>
+                                    </div>
+                                    <div id="BuildingMonthDIV" style="display:none">
+                                        <br />
+                                        <div class="row">
+                                            <label class="col-md-3"></label>
+                                            <button onclick="BM(0)" name="BMbtn" id="BM_0" type="button" class="btn-sm EMSdata" style="background-color:#003049;border:2px solid #003049;outline:none;color:white;">VCB1</button>&nbsp;&nbsp;
+                                            <button onclick="BM(1)" name="BMbtn" id="BM_1" type="button" class="btn-sm EMSdata" style="background-color:#D62828;border:2px solid #D62828;outline:none;color:white;">VCB2</button>&nbsp;&nbsp;
+                                            <button onclick="BM(2)" name="BMbtn" id="BM_2" type="button" class="btn-sm EMSdata" style="background-color:#F77F00;border:2px solid #F77F00;outline:none;color:white;">VCB3</button>&nbsp;&nbsp;
+                                            <button onclick="BM(3)" name="BMbtn" id="BM_3" type="button" class="btn-sm EMSdata" style="background-color:#FCBF49;border:2px solid #FCBF49;outline:none;color:white;">VCB4</button>&nbsp;&nbsp;
+                                            <button onclick="BM(4)" name="BMbtn" id="BM_4" type="button" class="btn-sm EMSdata" style="background-color:#94d2bd;border:2px solid #94d2bd;outline:none;color:white;">其他</button>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <label class="col-md-1"></label>
+                                            <div class="chart-container col-md-10" id="BuildingMChartDIV">
+                                                <div id="BuildingMChart"></div>
+                                            </div>
+                                        </div>
+                                        <table style="width:100%;font-weight:bold;">
+                                            <tbody>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">建物總用電度數</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelM" id="BuildingMonth_Total" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;">VCB1</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelM" id="BuildingMonth_VCB1" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">VCB2</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelM" id="BuildingMonth_VCB2" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;">VCB3</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelM" id="BuildingMonth_VCB3" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">VCB4</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelM" id="BuildingMonth_VCB4" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;">其他</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="BuildingLabelM" id="BuildingMonth_Others" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane " id="HVAC">
+                    @*<div class="row">
+                            <label class="col-md-6">
+                                VCB1-11#11為冰機1號；VCB1-11#12為冰機備用機；VCB1-11#13為冰機3號；VCB1-11#14為冰機4號；。
+                            </label>
+                            <label class="col-md-3">
+                                MP2-21 包含 冰水泵、冷卻水泵、區域泵、熱泵、水塔。
+                            </label>
+                        </div>*@
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card" style="background-color:#ffffff;">
+                                <div class="card-header card-header-icon card-header-info">
+                                    <h4 class="card-title" id="HVACYear_title" style="font-weight:bold;color:#036EB7">空調年度能源流向分析</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        &nbsp;&nbsp;&nbsp;
+                                        <div class="input-group col-md-4" id="HvacYDiv"></div>
+                                        <button onclick="EnergyDirectionSearch('Hvac_Y')" id="HvacSelectY" type="button" class="btn btn-fill btn-warning" style="font-weight:bold;">查詢</button>
+                                    </div>
+                                    <div id="HvacYearDIV" style="display:none">
+                                        <br />
+                                        <div class="row">
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <button onclick="HY(0)" name="HYbtn" id="HY_0" type="button" class="btn-sm EMSdata" style="background-color:#003049;border:2px solid #003049;outline:none;color:white;">冰水主機群</button>&nbsp;&nbsp;
+                                            <button onclick="HY(1)" name="HYbtn" id="HY_1" type="button" class="btn-sm EMSdata" style="background-color:#D62828;border:2px solid #D62828;outline:none;color:white;">冰水泵浦群</button>&nbsp;&nbsp;
+                                            <button onclick="HY(2)" name="HYbtn" id="HY_2" type="button" class="btn-sm EMSdata" style="background-color:#F77F00;border:2px solid #F77F00;outline:none;color:white;">冷卻水泵浦群</button>&nbsp;&nbsp;
+                                            <button onclick="HY(3)" name="HYbtn" id="HY_3" type="button" class="btn-sm EMSdata" style="background-color:#FCBF49;border:2px solid #FCBF49;outline:none;color:white;">區域泵浦群</button>&nbsp;&nbsp;
+                                            <button onclick="HY(4)" name="HYbtn" id="HY_4" type="button" class="btn-sm EMSdata" style="background-color:#94d2bd;border:2px solid #94d2bd;outline:none;color:white;">冷卻水塔群</button>&nbsp;&nbsp;
+                                            <button onclick="HY(5)" name="HYbtn" id="HY_5" type="button" class="btn-sm EMSdata" style="background-color:#2A9D8F;border:2px solid #2A9D8F;outline:none;color:white;">其他</button>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <label class="col-md-1"></label>
+                                            <div class="chart-container col-md-10" id="HvacYChartDIV">
+                                                <div id="HvacYChart"></div>
+                                            </div>
+                                        </div>
+                                        <table style="width:100%;font-weight:bold;">
+                                            <tbody>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">空調總用電度數</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_Total" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;">冰水主機群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_CH" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">冰水泵浦群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_CHP" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;">冷卻水泵浦群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_CWP" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">區域泵浦群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_ZP" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;">冷卻水塔群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_CT" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#036EB7;">其他</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelY" id="HVACYear_Others" style="color:#013d66;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#036EB7;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#036EB7;"></td>
+                                                    <td class="col-md-2"></td>
+                                                    <td class="col-md-1" style="color:#036EB7;"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card" style="background-color: #ffffff;">
+                                <div class="card-header card-header-icon card-header-info">
+                                    <h4 class="card-title" id="HVACMonth_title" style="font-weight:bold;color:#79beed">空調單月能源流向分析</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        &nbsp;&nbsp;&nbsp;
+                                        <div class="input-group col-md-4" id="HvacMDiv"></div>
+                                        <button onclick="EnergyDirectionSearch('Hvac_M')" id="HvacSelectM" type="button" class="btn btn-fill btn-warning" style="font-weight:bold;">查詢</button>
+                                    </div>
+                                    <div id="HvacMonthDIV" style="display:none">
+                                        <br />
+                                        <div class="row">
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <button onclick="HM(0)" name="HMbtn" id="HM_0" type="button" class="btn-sm EMSdata" style="background-color:#003049;border:2px solid #003049;outline:none;color:white;">冰水主機群</button>&nbsp;&nbsp;
+                                            <button onclick="HM(1)" name="HMbtn" id="HM_1" type="button" class="btn-sm EMSdata" style="background-color:#D62828;border:2px solid #D62828;outline:none;color:white;">冰水泵浦群</button>&nbsp;&nbsp;
+                                            <button onclick="HM(2)" name="HMbtn" id="HM_2" type="button" class="btn-sm EMSdata" style="background-color:#F77F00;border:2px solid #F77F00;outline:none;color:white;">冷卻水泵浦群</button>&nbsp;&nbsp;
+                                            <button onclick="HM(3)" name="HMbtn" id="HM_3" type="button" class="btn-sm EMSdata" style="background-color:#FCBF49;border:2px solid #FCBF49;outline:none;color:white;">區域泵浦群</button>&nbsp;&nbsp;
+                                            <button onclick="HM(4)" name="HMbtn" id="HM_4" type="button" class="btn-sm EMSdata" style="background-color:#94d2bd;border:2px solid #94d2bd;outline:none;color:white;">冷卻水塔群</button>&nbsp;&nbsp;
+                                            <button onclick="HM(5)" name="HMbtn" id="HM_5" type="button" class="btn-sm EMSdata" style="background-color:#2A9D8F;border:2px solid #2A9D8F;outline:none;color:white;">其他</button>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <label class="col-md-1"></label>
+                                            <div class="chart-container col-md-10" id="HvacMChartDIV">
+                                                <div id="HvacMChart"></div>
+                                            </div>
+                                        </div>
+                                        <table style="width:100%;font-weight:bold;">
+                                            <tbody>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">空調總用電度數</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_Total" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;">冰水主機群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_CH" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">冰水泵浦群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_CHP" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;">冷卻水泵浦群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_CWP" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">區域泵浦群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_ZP" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;">冷卻水塔群</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_CT" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                </tr>
+                                                <tr style="height:40px;font-size:large;">
+                                                    <td class="col-md-3" style="border-left:3px #FFD382 solid;color:#79beed;">其他</td>
+                                                    <td class="col-md-2" style="text-align:right;"><label name="HvacLabelM" id="HVACMonth_Others" style="color:#036EB7;font-size:large;line-height:0px;"></label></td>
+                                                    <td class="col-md-1" style="color:#79beed;">kWh</td>
+                                                    <td class="col-md-3" style="border-left:3px #82FFFF solid;color:#79beed;"></td>
+                                                    <td class="col-md-2"></td>
+                                                    <td class="col-md-1" style="color:#79beed;"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+    document.getElementById("SysAnalysisTitle").classList.add("active");
+    document.getElementById("SysAnalysis").classList.add("show");
+    document.getElementById("EnergyDirection").classList.add("active");
+    var first_time = [true, true, true, true];
+    var Index = 0;
+    var BYchart = [];
+    var BMchart = [];
+    var HYchart = [];
+    var HMchart = [];
+    $(document).ready(function () {
+        $().ready(function () {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Analysis/EnergyDirectionVal",
+                success: function (data) {
+                    console.log("LoadData_success");
+                    var BuildingYoptionstring = "";
+                    for (var i = 0; i < data[0].BuildingY.length; i++) BuildingYoptionstring = BuildingYoptionstring + '<option value="' + data[0].BuildingY[i] + '">' + data[0].BuildingY[i] + '</option>';
+                    $("#BuildingYDiv").append('<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年份" data-size="8" id="BuildingY"><option disabled="disabled" selected="selected">請選擇年份</option>' + BuildingYoptionstring + '</select>');
+                    $('.selectpicker').selectpicker('render');
+                    var BuildingMoptionstring = "";
+                    for (var i = 0; i < data[0].BuildingM.length; i++) BuildingMoptionstring = BuildingMoptionstring + '<option value="' + data[0].BuildingM[i] + '">' + data[0].BuildingM[i] + '</option>';
+                    $("#BuildingMDiv").append('<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇月份" data-size="8" id="BuildingM"><option disabled="disabled" selected="selected">請選擇月份</option>' + BuildingMoptionstring + '</select>');
+                    $('.selectpicker').selectpicker('render');
+                    var HvacYoptionstring = "";
+                    for (var i = 0; i < data[0].HvacY.length; i++) HvacYoptionstring = HvacYoptionstring + '<option value="' + data[0].HvacY[i] + '">' + data[0].HvacY[i] + '</option>';
+                    $("#HvacYDiv").append('<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年份" data-size="8" id="HvacY"><option disabled="disabled" selected="selected">請選擇年份</option>' + HvacYoptionstring + '</select>');
+                    $('.selectpicker').selectpicker('render');
+
+                    var HvacMoptionstring = "";
+                    for (var i = 0; i < data[0].HvacM.length; i++) HvacMoptionstring = HvacMoptionstring + '<option value="' + data[0].HvacM[i] + '">' + data[0].HvacM[i] + '</option>';
+                    $("#HvacMDiv").append('<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇月份" data-size="8" id="HvacM"><option disabled="disabled" selected="selected">請選擇月份</option>' + HvacMoptionstring + '</select>');
+                    $('.selectpicker').selectpicker('render');
+                },
+                error: function (result) {
+                    console.log("LoadData_false");
+                }
+            });
+        });
+    });
+
+    function EnergyDirectionSearch(e) {
+        var SearchType = e.split('_')[0];
+        var SearchTime = e.split('_')[1];
+        var SelectedTime = document.getElementById(SearchType + SearchTime).value;
+        if (SelectedTime == "請選擇年份") {
+            alert("請選擇年份");
+            return
+        }
+        else if (SelectedTime == "請選擇月份") {
+            alert("請選擇月份");
+            return
+        }
+        var ChangeText = "", ChartID = "", optionID = "", showDIV = "";
+        var ChartLabel = [];
+        if (SearchType == "Building" && SearchTime == "Y") {
+            showDIV = "#BuildingYearDIV";
+            Index = 0;
+            ChartID = "#BuildingYChart";
+            optionID = "BuildingYearChart";
+            ChartLabel = ["VCB1", "VCB2", "VCB3", "VCB4", "其他"];
+            ChangeText = "label[name=BuildingLabelY]";
+            var recoverbtn = document.querySelectorAll("button[name=BYbtn]");
+            for (var i = 0; i < recoverbtn.length; i++) {
+                var buttonID = recoverbtn[i];
+                buttonID.classList.add('EMSdata');
+                buttonID.style.backgroundColor = buttonID.style.borderColor;
+                buttonID.style.color = "white";
+            }
+        }
+        else if (SearchType == "Building" && SearchTime == "M") {
+            showDIV = "#BuildingMonthDIV";
+            Index = 1;
+            ChartID = "#BuildingMChart";
+            optionID = "BuildingMonthChart";
+            ChartLabel = ["VCB1", "VCB2", "VCB3", "VCB4", "其他"];
+            ChangeText = "label[name=BuildingLabelM]";
+        }
+        else if (SearchType == "Hvac" && SearchTime == "Y") {
+            showDIV = "#HvacYearDIV";
+            Index = 2;
+            ChartID = "#HvacYChart";
+            optionID = "HvacYearChart";
+            ChartLabel = ["冰水主機群", "冰水泵浦群", "冷卻水泵浦群", "區域泵浦群", "冷卻水塔群", "其他"];
+            ChangeText = "label[name=HvacLabelY]";
+        }
+        else if (SearchType == "Hvac" && SearchTime == "M") {
+            showDIV = "#HvacMonthDIV";
+            Index = 3;
+            ChartID = "#HvacMChart";
+            optionID = "HvacMonthChart";
+            ChartLabel = ["冰水主機群", "冰水泵浦群", "冷卻水泵浦群", "區域泵浦群", "冷卻水塔群", "其他"];
+            ChangeText = "label[name=HvacLabelM]";
+        }
+        var LabelData = [];
+        var ChartData = [];
+        let data = {
+            data: {
+                'SearchType': SearchType,
+                'SearchTime': SearchTime,
+                'SelectedTime': SelectedTime,
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Analysis/EnergyDirectionSearch",
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Search_success");
+                $(showDIV).show();
+                LabelData = data[0].LabelData;
+                ChartData = data[0].ChartData;
+                if (SearchType == "Building" && SearchTime == "Y") BYchart = data[0].ChartData;
+                else if (SearchType == "Building" && SearchTime == "M") BMchart = data[0].ChartData;
+                else if (SearchType == "Hvac" && SearchTime == "Y") HYchart = data[0].ChartData;
+                else if (SearchType == "Hvac" && SearchTime == "M") HMchart = data[0].ChartData;
+            },
+            error: function (res) {
+                console.log('Search_false');
+            }
+        });
+        //Label Data
+        var Labels = document.querySelectorAll(ChangeText);
+        for (var i = 0; i < Labels.length; i++) Labels[i].innerText = parseFloat(LabelData[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //Chart Data
+        if (first_time[Index]) {
+            first_time[Index] = false;
+            //Draw Chart
+            var options = {
+                chart: {
+                    type: 'pie',
+                    id: optionID,
+                    width: '100%',
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
+                        }
+                    }
+                },
+                colors: ["#003049", "#D62828", "#F77F00", "#FCBF49", "#94d2bd", "#2A9D8F"],
+                labels: ChartLabel,
+                dataLabels: {
+                    formatter(val, opts) {
+                        const name = opts.w.globals.labels[opts.seriesIndex]
+                        return [name + ' ' + val.toFixed(1) + ' %']
+                    }
+                },
+                legend: {
+                    show: false,
+                },
+                noData: {
+                    text: "Loading...",
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    offsetX: 0,
+                    offsetY: -30,
+                    style: {
+                        color: "#000000",
+                        fontSize: '20px',
+                        fontFamily: "Helvetica"
+                    }
+                },
+                //series: [],
+                series: ChartData,
+            };
+            var chart = new ApexCharts(document.querySelector(ChartID), options);
+            chart.render();
+        } else {
+            ApexCharts.exec(optionID, 'updateSeries', ChartData, true);
+        }
+    };
+
+    //Building Year Pie Button
+    function BY(e) {
+        var buttonID = document.getElementById("BY_" + e);
+        if (buttonID.classList.contains('EMSdata')) {
+            buttonID.classList.remove('EMSdata');
+            buttonID.style.backgroundColor = "white";
+            buttonID.style.color = buttonID.style.borderColor;
+        }
+        else {
+            buttonID.classList.add('EMSdata');
+            buttonID.style.backgroundColor = buttonID.style.borderColor;
+            buttonID.style.color = "white";
+        }
+        var BYbtn = document.querySelectorAll("button[name=BYbtn]");
+        var NewSerie = [];
+        for (var i = 0; i < BYbtn.length; i++) {
+            if (BYbtn[i].classList.contains('EMSdata')) NewSerie[i] = BYchart[i];
+            else NewSerie[i] = 0;
+        }
+        ApexCharts.exec('BuildingYearChart', 'updateSeries', NewSerie, true);
+    };
+
+    //Building Month Pie Button
+    function BM(e) {
+        var buttonID = document.getElementById("BM_" + e);
+        if (buttonID.classList.contains('EMSdata')) {
+            buttonID.classList.remove('EMSdata');
+            buttonID.style.backgroundColor = "white";
+            buttonID.style.color = buttonID.style.borderColor;
+        }
+        else {
+            buttonID.classList.add('EMSdata');
+            buttonID.style.backgroundColor = buttonID.style.borderColor;
+            buttonID.style.color = "white";
+        }
+        var BMbtn = document.querySelectorAll("button[name=BMbtn]");
+        var NewSerie = [];
+        for (var i = 0; i < BMbtn.length; i++) {
+            if (BMbtn[i].classList.contains('EMSdata')) NewSerie[i] = BMchart[i];
+            else NewSerie[i] = 0;
+        }
+        ApexCharts.exec('BuildingMonthChart', 'updateSeries', NewSerie, true);
+    };
+
+    //Hvac Year Pie Button
+    function HY(e) {
+        var buttonID = document.getElementById("HY_" + e);
+        if (buttonID.classList.contains('EMSdata')) {
+            buttonID.classList.remove('EMSdata');
+            buttonID.style.backgroundColor = "white";
+            buttonID.style.color = buttonID.style.borderColor;
+        }
+        else {
+            buttonID.classList.add('EMSdata');
+            buttonID.style.backgroundColor = buttonID.style.borderColor;
+            buttonID.style.color = "white";
+        }
+        var HYbtn = document.querySelectorAll("button[name=HYbtn]");
+        var NewSerie = [];
+        for (var i = 0; i < HYbtn.length; i++) {
+            if (HYbtn[i].classList.contains('EMSdata')) NewSerie[i] = HYchart[i];
+            else NewSerie[i] = 0;
+        }
+        ApexCharts.exec('HvacYearChart', 'updateSeries', NewSerie, true);
+    };
+
+    //Hvac Month Pie Button
+    function HM(e) {
+        var buttonID = document.getElementById("HM_" + e);
+        if (buttonID.classList.contains('EMSdata')) {
+            buttonID.classList.remove('EMSdata');
+            buttonID.style.backgroundColor = "white";
+            buttonID.style.color = buttonID.style.borderColor;
+        }
+        else {
+            buttonID.classList.add('EMSdata');
+            buttonID.style.backgroundColor = buttonID.style.borderColor;
+            buttonID.style.color = "white";
+        }
+        var HMbtn = document.querySelectorAll("button[name=HMbtn]");
+        var NewSerie = [];
+        for (var i = 0; i < HMbtn.length; i++) {
+            if (HMbtn[i].classList.contains('EMSdata')) NewSerie[i] = HMchart[i];
+            else NewSerie[i] = 0;
+        }
+        ApexCharts.exec('HvacMonthChart', 'updateSeries', NewSerie, true);
+    };
+</script>

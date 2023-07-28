@@ -1,0 +1,741 @@
+﻿<div class="row">
+    <div class="col-lg-8 col-md-12 col-sm-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">flash_on</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">一樓總耗電</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-2"></label>
+                    <div class="col-md-6">
+                        <button id="DPhour3" type="button" class="btn btn-info btn-sm" onclick="NearOneHour()">最近一小時</button>&nbsp;
+                        <button id="DPday" type="button" class="btn btn-info btn-sm active" onclick="NearFourHour()">最近四小時</button>
+                        <button id="DPday" type="button" class="btn btn-info btn-sm active" onclick="Today()">今日</button>
+
+                    </div>
+                    <label id="InstantTime" class="col-md-3" style="margin-top:9px;margin-bottom:5px;"></label>
+                </div>
+
+
+                <div class="row">
+                    @*開源apexchart*@
+                    <label class="col-md-1"></label>
+                    <div class="chart-container col-md-10" id="Outchart">
+                        <div id="chart"></div>
+                    </div>
+                </div>@*開源apexchart*@
+
+
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="top">
+                <div class="card-header card-header-icon card-header-info">
+                    <div class="card-icon">
+                        <i class="material-icons">apartment</i>
+                    </div>
+                    <h4 class="card-title" style="font-weight:bold;color:#013d66">1F即時用電資訊</h4>
+                </div>
+                <div class="card-body">
+                    <table style="width:100%;font-weight:bold;color:#013d66;font-size:large;">
+                        <tr style="height:40px;">
+
+                            <td class="col-sm-5" style="width:16%;height:40px;border-left:3px #FFD382 solid;color:#013d66;">目前時間:</td>
+                            <td id="RealTime" style="width: 16%; color: #013d66;text-align:left;">2022-08-04 13:41:49</td>
+                        </tr>
+                        <tr style="height:40px;">
+
+                            <td class="col-sm-5" style="width:16%;height:40px;border-left:3px #FFD382 solid;color:#013d66;">即時用電:</td>
+                            <td id="RealTimePower" style="width:16%;color:#013d66;text-align:left;">7.6 kW</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="background-color: #ffffff;">
+            <div class="bottom">
+
+                <div class="card-header card-header-icon card-header-info">
+                    <div class="card-icon">
+                        <i class="material-icons">apartment</i>
+                    </div>
+                    <h4 class="card-title" style="font-weight:bold;color:#013d66">照明資訊</h4>
+                </div>
+                <div class="card-body">
+                    <table style="width:100%;font-weight:bold;color:#013d66;font-size:large;">
+                        <tr style="height:40px;">
+                            <td class="col-sm-5" style="width:16%;height:40px;border-left:3px #FFD382 solid;color:#013d66;">現在開關狀態:</td>
+                            <td style="width:16%;color:#013d66;"><label id="LightModeNow" style="font-weight:bold;text-align:center;color:black;font-size:large;line-height:0px;"></label></td>
+                        </tr>
+                        <tr style="height:40px;">
+                            <td class="col-sm-5" style="width:16%;height:40px;border-left:3px #FFD382 solid;color:#013d66;">昨日開啟時間:</td>
+                            <td style="width:16%;color:#013d66;"><label style="font-weight: bold; text-align: center; color: black; font-size: large; line-height: 0px;" id="YesterdayTurnOn"></label></td>
+                        </tr>
+                        <tr style="height:40px;">
+                            <td class="col-sm-5" style="width:16%;height:40px;border-left:3px #FFD382 solid;color:#013d66;">昨日關閉時間:</td>
+                            <td style="width:16%;color:#013d66;"><label style="font-weight: bold; text-align: center; color: black; font-size: large; line-height: 0px;" id="YesterdayTurnOff"></label></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">dvr</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">空調狀態資訊</h4>
+            </div>
+            <div class="card-body">
+
+                <div class="tab-content tab-space">
+                    <div class="tab-pane active" id="AClink">
+                        <div class="row">
+                            <div class="col-sm-12 table-hover">
+                                <div class="table-responsive">
+                                    <table style="width:100%;font-weight:bold;text-align:center;color:black;">
+                                        <thead>
+                                            <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:45px;">
+                                                <th></th>
+                                                <th style="font-size: large; font-weight: bold">開關機狀態</th>
+                                                <th style="font-size: large; font-weight: bold">風速設定狀態</th>
+                                                <th style="font-size: large; font-weight: bold">累積耗電度數 (kWh)</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="background-color:#EEEEEE;height:45px;">
+                                                <td style="background-color: #b2dbf7; font-size: large; font-weight: bold">B1F</td>
+                                                <td id="Now_AC1_OnOff" style="font-weight: bold; text-align: center; color: #4682B4; font-size: large; font-weight: bold">開機</td>
+                                                <td id="Now_AC1_Speed" style="font-size: large; font-weight: bold">弱風</td>
+                                                <td id="KWH1" style="font-size: large; font-weight: bold">2342</td>
+                                            </tr>
+                                            <tr style="background-color:#FAFAFA;height:45px;">
+                                                <td style="background-color: #e3f4ff; font-size: large; font-weight: bold">1F-1</td>
+                                                <td id="Now_AC2_OnOff" style="font-weight: bold; text-align: center; color: #4682B4; font-size: large; font-weight: bold">開機</td>
+                                                <td id="Now_AC2_Speed" style="font-size: large; font-weight: bold">強風</td>
+                                                <td id="KWH2" style="font-size: large; font-weight: bold">2122</td>
+                                            </tr>
+                                            <tr style="background-color:#EEEEEE;height:45px;">
+                                                <td style="background-color: #b2dbf7; font-size: large; font-weight: bold">1F-2</td>
+                                                <td id="Now_AC3_OnOff" style="font-weight: bold; text-align: center; color: #4682B4; font-size: large; font-weight: bold">關機</td>
+                                                <td id="Now_AC3_Speed" style="font-size: large; font-weight: bold">微風</td>
+                                                <td id="KWH3" style="font-size: large; font-weight: bold">2312</td>
+                                            </tr>
+                                            <tr style="background-color:#FAFAFA;height:45px;">
+                                                <td style="background-color: #e3f4ff; font-size: large; font-weight: bold">2F-1</td>
+                                                <td id="Now_AC4_OnOff" style="font-weight: bold; text-align: center; color: #4682B4; font-size: large; font-weight: bold">關機</td>
+                                                <td id="Now_AC4_Speed" style="font-size: large; font-weight: bold">強風</td>
+                                                <td id="KWH4" style="font-size: large; font-weight: bold">2198</td>
+                                            </tr>
+                                            <tr style="background-color:#EEEEEE;height:45px;">
+                                                <td style="background-color: #b2dbf7; font-size: large; font-weight: bold">2F-2</td>
+                                                <td id="Now_AC5_OnOff" style="font-weight: bold; text-align: center; color: #4682B4; font-size: large; font-weight: bold">開機</td>
+                                                <td id="Now_AC5_Speed" style="font-size: large; font-weight: bold">微風</td>
+                                                <td id="KWH5" style="font-size: large; font-weight: bold">2224</td>
+                                            </tr>
+                                            <tr style="background-color:#FAFAFA;border-bottom:2px #000000 solid;height:45px;">
+                                                <td style="background-color: #e3f4ff; font-size: large; font-weight: bold">2F-3</td>
+                                                <td id="Now_AC6_OnOff" style="font-weight: bold; text-align: center; color: #4682B4; font-size: large; font-weight: bold">關機</td>
+                                                <td id="Now_AC6_Speed" style="font-size: large; font-weight: bold">強風</td>
+                                                <td id="KWH6" style="font-size: large; font-weight: bold">2230</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    //document.getElementById("HomePage").classList.add("active");
+
+    var Plus12ToHour = function (date) {
+
+        var str = date;
+        var Plus12ToHour;
+
+        // 有找到'下'就加12小, ''
+        if (str.search('下') != -1 && (str[str.length - 8] + str[str.length - 7]) != 12) { // output: true
+            Plus12ToHour = 1;
+        }
+
+        // 如果碰到 '上午12:00:00' 的情況, 要轉換成00:00:00
+        if (str.search('上') != -1 && (str[str.length - 8] + str[str.length - 7]) == 12) {
+            Plus12ToHour = -1;
+        }
+
+        var re = /[/:上下午]/gi;
+        var newStr = str.replace(re, ''); // output: 2022715050000
+
+        newStr = [...newStr]; // string to array
+
+        if (Plus12ToHour == 1) { // 月份個位數/十位數 呈現結果不同: 加錯欄位
+            newStr[newStr.length - 6] = parseInt(newStr[newStr.length - 6]) + 1; // 十位數
+            newStr[newStr.length - 5] = parseInt(newStr[newStr.length - 5]) + 2; // 個位數
+
+            if (newStr[newStr.length - 5] >= 10) { // 碰到個位數需要進位的狀況
+                newStr[newStr.length - 5] -= 10;
+                newStr[newStr.length - 6] += 1;
+            }
+        }
+        else if (Plus12ToHour == -1) { // 令: 十位數=0, 個位數=0
+            newStr[newStr.length - 6] = 0; // 十位數
+            newStr[newStr.length - 5] = 0; // 個位數
+        }
+
+        if (newStr.length == 13) { // 缺0的話要補0
+            newStr.splice(4, 0, 0);
+        }
+        newStr.splice(newStr.length - 1, 1,); // 刪最後
+        newStr.splice(newStr.length - 1, 1,); // 刪最後
+
+        while (newStr.length >= 5) { // 刪除到長度=4
+            newStr.splice(0, 1,); // 刪第一個元素
+        }
+
+        newStr.splice(2, 0, ":"); // 刪第一個元素
+        newStr = newStr.join(''); // 20220715170000
+        return newStr;
+    }
+
+    $.ajax({ // Home/Index_即時用電需量
+        cache: false,
+        async: false,
+        type: "POST",
+        dataType: "json",
+        url: "/Home/HistoryVal",
+        success: function (data) { // 已收到後台數值
+            Time1 = data[0].Timeall;
+            Power1 = data[0].Powerall;
+            for (let x = 0; x <= Time1.length - 1; x++) {
+                Time1[x] = Plus12ToHour(Time1[x]);
+            }
+        }
+    });
+
+    var options = { // 開源apexchart
+        series: [{
+            name: "Desktops",
+            data: Power1
+        }],
+        chart: {
+            height: 350,
+            type: 'line',
+            zoom: {
+                enabled: false
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'straight'
+        },
+        title: {
+            //text: 'Product Trends by Month',
+            align: 'left'
+        },
+        grid: {
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+            },
+        },
+        xaxis: { // 需改成: 沒有上午下午
+            categories: Time1,
+            tickAmount: 10,
+        },
+        yaxis: {
+            title: {
+                text: '耗電量(kW)',
+            }
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+    chart.render();
+
+</script>
+
+<script>
+    var Today = function () { // 一樓總耗電_今日
+
+        $.ajax({ // Home/Index_即時用電需量
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            url: "/Home/OneFloorSwitch",
+            data: { OneFloor_Mode: "1" },
+            success: function (data) { // 已收到後台數值
+
+                Time1 = data[0].Time;
+                Power1 = data[0].Power;
+                for (let x = 0; x <= Time1.length - 1; x++) {
+                    Time1[x] = Plus12ToHour(Time1[x]);
+                }
+            }
+        });
+
+        $("#chart").remove();
+        $("#Outchart").append('<div id="chart"></div>');
+        var options = { // 開源apexchart
+            series: [{
+                name: "Desktops",
+                data: Power1
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                //text: 'Product Trends by Month',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: { // 需改成: 沒有上午下午
+                categories: Time1,
+                tickAmount: 10
+
+            },
+            yaxis: {
+                title: {
+                    text: '耗電量(kW)',
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+    } // Today()
+
+    var NearOneHour = function () { // 一樓總耗電_今日
+
+        $.ajax({ // Home/Index_即時用電需量
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            url: "/Home/OneFloorSwitch",
+            data: { OneFloor_Mode: "2" },
+            success: function (data) { // 已收到後台數值
+
+                Time1 = data[0].Time;
+                Power1 = data[0].Power;
+                for (let x = 0; x <= Time1.length - 1; x++) {
+                    Time1[x] = Plus12ToHour(Time1[x]);
+                }
+            }
+        });
+
+        $("#chart").remove();
+        $("#Outchart").append('<div id="chart"></div>');
+        var options = { // 開源apexchart
+            series: [{
+                name: "Desktops",
+                data: Power1
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                //text: 'Product Trends by Month',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: { // 需改成: 沒有上午下午
+                categories: Time1,
+                tickAmount: 10
+
+            },
+            yaxis: {
+                title: {
+                    text: '耗電量(kW)',
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+    } // Today()
+
+    var NearFourHour = function () { // 一樓總耗電_今日
+
+        $.ajax({ // Home/Index_即時用電需量
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            url: "/Home/OneFloorSwitch",
+            data: { OneFloor_Mode: "3" },
+            success: function (data) { // 已收到後台數值
+
+                Time1 = data[0].Time;
+                Power1 = data[0].Power;
+                for (let x = 0; x <= Time1.length - 1; x++) {
+                    Time1[x] = Plus12ToHour(Time1[x]);
+                }
+            }
+        });
+
+        $("#chart").remove();
+        $("#Outchart").append('<div id="chart"></div>');
+        var options = { // 開源apexchart
+            series: [{
+                name: "Desktops",
+                data: Power1
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                //text: 'Product Trends by Month',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: { // 需改成: 沒有上午下午
+                categories: Time1,
+                tickAmount: 10
+
+            },
+            yaxis: {
+                title: {
+                    text: '耗電量(kW)',
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+    } // Today()
+</script>
+
+
+<script>
+    $.ajax({ // 撈SQL資料_主頁_下方表格
+        type: "POST",//Request type
+        dataType: "json",//把從後台撈到的資料轉換成預期的資料類型
+        url: "/Home/HistoryVal",
+        success: function (data) {//success: function(response){ 請求成功後，function(data)會被呼叫，data代表從後台撈到的資料
+
+            var OperationAC1 = data[0].OperationAC1; // 1號冷氣
+            var SpeedAC1 = data[0].SpeedAC1;
+
+            if (OperationAC1 == 0) { // 開關機
+                OperationAC1 = "OFF";
+            }
+            else if (OperationAC1 == 1) {
+                OperationAC1 = "ON";
+            }
+
+            if (SpeedAC1 == 7) { // 風量
+                SpeedAC1 = "自動";
+            }
+            else if (SpeedAC1 == 1) {
+                SpeedAC1 = "微風";
+            }
+            else if (SpeedAC1 == 3) {
+                SpeedAC1 = "弱風";
+            }
+            else if (SpeedAC1 == 4) {
+                SpeedAC1 = "強風";
+            } else if (SpeedAC1 == 5) {
+                SpeedAC1 = "自動";
+            }
+
+            document.getElementById("Now_AC1_OnOff").innerHTML = OperationAC1;
+            document.getElementById("Now_AC1_Speed").innerHTML = SpeedAC1;
+
+            var OperationAC2 = data[0].OperationAC2; // 2號冷氣
+            var SpeedAC2 = data[0].SpeedAC2;
+
+            if (OperationAC2 == 0) { // 開關機
+                OperationAC2 = "OFF";
+            }
+            else if (OperationAC2 == 1) {
+                OperationAC2 = "ON";
+            }
+
+
+            if (SpeedAC2 == 7) { // 風量
+                SpeedAC2 = "自動";
+            }
+            else if (SpeedAC2 == 1) {
+                SpeedAC2 = "微風";
+            }
+            else if (SpeedAC2 == 3) {
+                SpeedAC2 = "弱風";
+            }
+            else if (SpeedAC2 == 4) {
+                SpeedAC2 = "強風";
+            } else if (SpeedAC2 == 5) {
+                SpeedAC2 = "自動";
+            }
+
+            document.getElementById("Now_AC2_OnOff").innerHTML = OperationAC2;
+            document.getElementById("Now_AC2_Speed").innerHTML = SpeedAC2;
+
+
+            var OperationAC3 = data[0].OperationAC3; // 1號冷氣
+            var SpeedAC3 = data[0].SpeedAC3;
+
+            if (OperationAC3 == 0) { // 開關機
+                OperationAC3 = "OFF";
+            }
+            else if (OperationAC3 == 1) {
+                OperationAC3 = "ON";
+            }
+
+
+            if (SpeedAC3 == 7) { // 風量
+                SpeedAC3 = "自動";
+            }
+            else if (SpeedAC3 == 1) {
+                SpeedAC3 = "微風";
+            }
+            else if (SpeedAC3 == 3) {
+                SpeedAC3 = "弱風";
+            }
+            else if (SpeedAC3 == 4) {
+                SpeedAC3 = "強風";
+            } else if (SpeedAC3 == 5) {
+                SpeedAC3 = "自動";
+            }
+
+
+            document.getElementById("Now_AC3_OnOff").innerHTML = OperationAC3;
+            document.getElementById("Now_AC3_Speed").innerHTML = SpeedAC3;
+
+            var OperationAC4 = data[0].OperationAC4; // 4號冷氣
+            var SpeedAC4 = data[0].SpeedAC4;
+
+            if (OperationAC4 == 0) { // 開關機
+                OperationAC4 = "OFF";
+            }
+            else if (OperationAC4 == 1) {
+                OperationAC4 = "ON";
+            }
+
+
+            if (SpeedAC4 == 7) { // 風量
+                SpeedAC4 = "自動";
+            }
+            else if (SpeedAC4 == 1) {
+                SpeedAC4 = "微風";
+            }
+            else if (SpeedAC4 == 3) {
+                SpeedAC4 = "弱風";
+            }
+            else if (SpeedAC4 == 4) {
+                SpeedAC4 = "強風";
+            } else if (SpeedAC4 == 5) {
+                SpeedAC4 = "自動";
+            }
+
+            document.getElementById("Now_AC4_OnOff").innerHTML = OperationAC4;
+            document.getElementById("Now_AC4_Speed").innerHTML = SpeedAC4;
+
+            var OperationAC5 = data[0].OperationAC5; // 5號冷氣
+            var SpeedAC5 = data[0].SpeedAC5;
+
+            if (OperationAC5 == 0) { // 開關機
+                OperationAC5 = "OFF";
+            }
+            else if (OperationAC5 == 1) {
+                OperationAC5 = "ON";
+            }
+
+
+            if (SpeedAC5 == 7) { // 風量
+                SpeedAC5 = "自動";
+            }
+            else if (SpeedAC5 == 1) {
+                SpeedAC5 = "微風";
+            }
+            else if (SpeedAC5 == 3) {
+                SpeedAC5 = "弱風";
+            }
+            else if (SpeedAC5 == 4) {
+                SpeedAC5 = "強風";
+            } else if (SpeedAC5 == 5) {
+                SpeedAC5 = "自動";
+            }
+
+            document.getElementById("Now_AC5_OnOff").innerHTML = OperationAC5;
+            document.getElementById("Now_AC5_Speed").innerHTML = SpeedAC5;
+
+            var OperationAC6 = data[0].OperationAC6; // 1號冷氣
+            var SpeedAC6 = data[0].SpeedAC6;
+
+            if (OperationAC6 == 0) { // 開關機
+                OperationAC6 = "OFF";
+            }
+            else if (OperationAC6 == 1) {
+                OperationAC6 = "ON";
+            }
+
+
+            if (SpeedAC6 == 7) { // 風量
+                SpeedAC6 = "自動";
+            }
+            else if (SpeedAC6 == 1) {
+                SpeedAC6 = "微風";
+            }
+            else if (SpeedAC6 == 3) {
+                SpeedAC6 = "弱風";
+            }
+            else if (SpeedAC6 == 4) {
+                SpeedAC6 = "強風";
+            } else if (SpeedAC6 == 5) {
+                SpeedAC6 = "自動";
+            }
+
+            document.getElementById("Now_AC6_OnOff").innerHTML = OperationAC6;
+            document.getElementById("Now_AC6_Speed").innerHTML = SpeedAC6;
+        } // ajax_success
+    });
+
+</script>
+
+<script>
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "/Home/TOTAL_KWH",
+        success: function (data) {
+            document.getElementById('KWH1').innerHTML = data[0].KWH1 + " (kWh)";
+            document.getElementById('KWH2').innerHTML = data[0].KWH2 + " (kWh)";
+            document.getElementById('KWH3').innerHTML = data[0].KWH3 + " (kWh)";
+            document.getElementById('KWH4').innerHTML = data[0].KWH4 + " (kWh)";
+            document.getElementById('KWH5').innerHTML = data[0].KWH5 + " (kWh)";
+            document.getElementById('KWH6').innerHTML = data[0].KWH6 + " (kWh)";
+        }
+    });
+
+</script>
+
+<script>
+    $.ajax({ // 撈SQL資料
+        type: "POST",
+        dataType: "json",
+        url: "/Home/LightHistory",
+        success: function (data) {
+            var LightModeNow;
+            if (data[0].OnOff[0] == 2) {
+                LightModeNow = "開燈";
+            }
+            else if (data[0].OnOff[0] == 1) {
+                LightModeNow = "關燈";
+            }
+
+            document.getElementById("LightModeNow").innerHTML = LightModeNow;
+        }
+    });
+</script>
+
+<script>
+    $.ajax({
+        type: "POST",//Request type
+        dataType: "json",//把從後台撈到的資料轉換成預期的資料類型
+        url: "/Home/RealTime",
+        success: function (data) {
+            document.getElementById("RealTime").innerHTML = data[0].RealTime;
+            document.getElementById("RealTimePower").innerHTML = data[0].RealTimePower + " kW";
+        }
+    });
+</script>
+
+<script>
+    $.ajax({
+        type: "POST",//Request type
+        dataType: "json",//把從後台撈到的資料轉換成預期的資料類型
+        url: "/Home/LightHistory_Yesterday",
+        success: function (data) {
+            var TimeOn = data[0].TimeOn;
+            var TimeOff = data[0].TimeOff;
+
+            var dealwithtime = function (OnOrOff) {
+                OnOrOff = [...OnOrOff]; // string to array
+                while (OnOrOff[0] != '上' && OnOrOff[0] != '下') {
+                    OnOrOff.splice(0, 1,);
+                }
+                //for (let x = 0; x <= 2; x++) {
+                //    OnOrOff.splice(OnOrOff.length-1, 1,);
+                //}
+                OnOrOff = OnOrOff.join('');
+                return OnOrOff;
+            }
+
+            for (let x = 0; x <= TimeOn.length - 1; x++) {
+                TimeOn[x] = dealwithtime(TimeOn[x]);
+            }
+            for (let x = 0; x <= TimeOff.length - 1; x++) {
+                TimeOff[x] = dealwithtime(TimeOff[x]);
+            }
+
+            document.getElementById("YesterdayTurnOn").innerHTML = data[0].TimeOn;
+            document.getElementById("YesterdayTurnOff").innerHTML = data[0].TimeOff;       
+        }
+    });
+</script>

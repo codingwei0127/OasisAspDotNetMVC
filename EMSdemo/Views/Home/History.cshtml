@@ -1,0 +1,523 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .wrap {
+        margin: 4rem auto;
+        width: 1000px;
+        position: relative;
+        background: #fff;
+    }
+
+    .chart-box {
+        padding-left: 0;
+        background: #fff;
+    }
+
+    #chart-Total,
+    #chart-SB {
+        width: 96%;
+        max-width: 48%;
+        box-shadow: none;
+    }
+
+    #chart-Total {
+        float: left;
+        position: relative;
+        transition: 1s ease transform;
+        z-index: 3;
+    }
+
+        #chart-Total.chart-SB-activated {
+            transform: translateX(0);
+            transition: 1s ease transform;
+        }
+
+    #chart-SB {
+        float: left;
+        position: relative;
+        z-index: -2;
+        transition: 1s ease transform;
+    }
+
+        #chart-SB.active {
+            transition: 1.1s ease-in-out transform;
+            transform: translateX(0);
+            z-index: 1;
+        }
+
+    @@media screen and (min-width: 480px) {
+        #chart-Total {
+            transform: translateX(50%);
+        }
+
+        #chart-SB {
+            transform: translateX(-50%);
+        }
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">flash_on</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">用電歷史查詢</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    起始時間：
+                    <input type="date" class="form-control datepicker" value="2022/5/24" id="start" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    結束時間：
+                    <input type="date" class="form-control datepicker" value="2022/8/2" id="end" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    選擇電盤：
+                    <select class="selectpicker" data-size="5" data-style="btn btn-info btn-fill" title="請選擇電盤" id="equipmentID">
+                        <option disabled="disabled" selected="selected">請選擇電盤</option>
+                        <option value="VCB1">1F</option>
+
+                    </select>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button onclick="Button()" id="SearchButton" type="button" class="btn btn-fill btn-sm btn-warning" style="font-weight:bold;margin-top:5px;margin-bottom:9px;">查詢</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="EleHistoryReport()" id="OutputButton" type="button" class="btn btn-fill btn-success SearchSuccess" style="font-weight:bold;margin-top:5px;margin-bottom:9px;display:none;">輸出成Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div id="downloadfile"></div>
+                </div>
+
+                <div class="row">
+                    @*開源apexchart*@
+                    <label class="col-md-1"></label>
+                    <div class="chart-container col-md-10" id="ChartDIV1">                     
+                        <div id="ChartRange"></div>
+                    </div>
+                </div>@*開源apexchart*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">flash_on</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">電盤資訊查詢</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div>
+                        選擇週期：
+                        <select class="selectpicker" data-size="5" data-style="btn btn-info btn-fill" title="請選擇週期" id="SearchPeriod" onchange="ChangePeriod()">
+                            <option disabled="disabled" selected="selected">請選擇週期</option>
+                            <option value="Year">年</option>
+                            <option value="Month">月</option>
+                            <option value="Day">日</option>
+                        </select>
+                    </div>
+                    <div class="SearchYear" style="margin-top:12px;margin-bottom:5px;display:none;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        選擇年分：
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                    <div id="SelectYearDiv_big" class="SearchYear" style="display:none;">
+                        <div id="SelectYearDiv"></div>
+                    </div>
+                    <div class="SearchMonth" style="margin-top:12px;margin-bottom:5px;display:none;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        選擇年月分：
+                    </div>
+                    <div class="SearchMonth" style="display:none;">
+                        <div id="SelectMonthDiv"></div>
+                    </div>
+
+                    <div class="SearchWeek" style="display:none;">
+                        <div id="SelectWeekDiv"></div>
+                    </div>
+                    <div class="SearchDay" style="margin-top:12px;margin-bottom:5px;display:none;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        選擇日期：
+                    </div>
+                    <div class="SearchDay" style="margin-top:5px;margin-bottom:5px;display:none;">
+                        <input type="date" class="form-control datepicker" id="SelectDay" style="font-weight:bold;color:#013d66;text-align:center;">
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button onclick="YearMonthQuery()" id="SearchButton" type="button" class="btn btn-fill btn-sm btn-warning" style="font-weight:bold;margin-top:5px;margin-bottom:9px;">查詢</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="SwitchBoardReport()" id="OutputButton" type="button" class="btn btn-fill btn-success SearchSuccess" style="font-weight:bold;margin-top:5px;margin-bottom:9px;display:none;">輸出成Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div id="downloadfile"></div>
+                </div>
+
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <div class="chart-container col-md-10" id="MonthYear_OUT">
+                        <div id="MonthYear_Chart"></div>
+                    </div>
+                </div>@*開源apexchart*@
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row SearchSuccess" id="SearchDIV" style="display:none;">
+    <div class="col-md-12">
+        <table class="col-md-12" id="Table_SwitchBoard" style="font-weight:bold;text-align:center;color:black;border-bottom:2px #000000 solid;">
+            <thead id="TableThead">
+                <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">
+                    <th class="col-md-2">電盤名稱</th>
+                    <th class="col-md-3" id="ThisPeriod">本時間段數值(kWh)</th>
+                    <th class="col-md-3" id="LastPeriod">前一時間段數值(kWh)</th>
+                    <th class="col-md-2">差異值(kWh)</th>
+                    <th class="col-md-2">成長幅度(%)</th>
+                </tr>
+            </thead>
+            <tbody id="TableTbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row SearchSuccess" style="display:none;">
+    <div class="wrap">
+        <div id="chart-Total" class="chart-box"></div>
+        <br />
+        <div class="row" id="SBbtnDiv" style="display:none;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button onclick="SB(0)" name="SBbtn" id="SB_0" type="button" class="btn-sm EMSdata" style="background-color:#003049;border:2px solid #003049;outline:none;color:white;">VCB1</button>&nbsp;&nbsp;
+            <button onclick="SB(1)" name="SBbtn" id="SB_1" type="button" class="btn-sm EMSdata" style="background-color:#D62828;border:2px solid #D62828;outline:none;color:white;">VCB2</button>&nbsp;&nbsp;
+            <button onclick="SB(2)" name="SBbtn" id="SB_2" type="button" class="btn-sm EMSdata" style="background-color:#F77F00;border:2px solid #F77F00;outline:none;color:white;">VCB3</button>&nbsp;&nbsp;
+            <button onclick="SB(3)" name="SBbtn" id="SB_3" type="button" class="btn-sm EMSdata" style="background-color:#FCBF49;border:2px solid #FCBF49;outline:none;color:white;">VCB4</button>&nbsp;&nbsp;
+            <button onclick="SB(4)" name="SBbtn" id="SB_4" type="button" class="btn-sm EMSdata" style="background-color:#94d2bd;border:2px solid #94d2bd;outline:none;color:white;">其他</button>
+        </div>
+        <div id="chart-SB" class="chart-box"></div>
+    </div>
+</div>
+<script>
+    //var QueryMode; // 現在選擇的是哪一種週期?
+    document.getElementById("SysSearchTitle").classList.add("active");
+    document.getElementById("SysSearch").classList.add("show");
+    document.getElementById("SwitchBoardData").classList.add("active");
+    var SearchorNot = false;
+    var selectedBar = 0;
+    var SBchart = [];
+    $(document).ready(function () {
+        // initialise Datetimepicker and Sliders
+        md.initFormExtendedDatetimepickers();
+        if ($('.slider').length != 0) {
+            md.initSliders();
+        }
+        $("#SearchDay").datepicker("setDate", new Date());
+    });
+
+    function ChangePeriod() {
+        var SelectPeriod = document.getElementById("SearchPeriod").value;
+        if (SelectPeriod == "Day") {
+            $(".SearchYear").hide();
+            $(".SearchMonth").hide();
+            $(".SearchWeek").hide();
+            $(".SearchDay").show();
+        }
+        else if (SelectPeriod == "Year" || SelectPeriod == "Month" || SelectPeriod == "Week") {
+            let data = {
+                data: {
+                    'SelectPeriod': SelectPeriod,
+                }
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Search/SBChangePeriod",
+                contentType: 'application/json;charset=UTF-8',
+                async: false,
+                cache: false,
+                dataType: "json",
+                data: JSON.stringify(data),
+                success: function (data) {
+                    console.log("ChangePeriod_success");
+                    if (SelectPeriod == "Year") {
+                        document.getElementById("SelectYearDiv").innerHTML = "";
+                        var SelectTimestring = "";
+                        for (var i = 0; i < data[0].Time.length; i++) SelectTimestring = SelectTimestring + '<option value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</option>';
+                        $("#SelectYearDiv").append('<select id="SelectYear" class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年分" data-size="8"><option disabled="disabled" selected="selected">請選擇年分</option>' + SelectTimestring + '</select>');
+                        $('.selectpicker').selectpicker('render');
+                        $(".SearchYear").show();
+                        $(".SearchMonth").hide();
+                        $(".SearchWeek").hide();
+                        $(".SearchDay").hide();
+                    }
+                    else if (SelectPeriod == "Month") {
+                        document.getElementById("SelectMonthDiv").innerHTML = "";
+                        for (var i = 0; i < data[0].Time.length; i++) SelectTimestring = SelectTimestring + '<option value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</option>';
+                        $("#SelectMonthDiv").append('<select id="SelectMonth" class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年月分" data-size="8"><option disabled="disabled" selected="selected">請選擇年月分</option>' + SelectTimestring + '</select>');
+                        $('.selectpicker').selectpicker('render');
+                        $(".SearchYear").hide();
+                        $(".SearchMonth").show();
+                        $(".SearchWeek").hide();
+                        $(".SearchDay").hide();
+                    }
+                    else if (SelectPeriod == "Week") {
+                        document.getElementById("SelectWeekDiv").innerHTML = "";
+                        for (var i = 0; i < data[0].Time.length; i++) SelectTimestring = SelectTimestring + '<option value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</option>';
+                        $("#SelectWeekDiv").append('<select id="SelectWeek" class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年分週數" data-size="8"><option disabled="disabled" selected="selected">請選擇年分週數</option>' + SelectTimestring + '</select>');
+                        $('.selectpicker').selectpicker('render');
+                        $(".SearchYear").hide();
+                        $(".SearchMonth").hide();
+                        $(".SearchWeek").show();
+                        $(".SearchDay").hide();
+                    }
+                },
+                error: function (res) {
+                    console.log('ChangePeriod_false');
+                }
+            });
+        }
+    };
+
+</script>
+
+<script>
+
+    var YearMonthQuery = function () {
+
+        var Time, Power, PassTime;
+        var SelectYear, SelectMonth, SearchDay;
+        var QueryMode = -1; // 年:1, 月:2, 日:3
+
+        var Plus12ToHour = function (date) {
+
+            date = [...date];
+            for (let x = 0; x <= 2; x++) {
+                date.splice(date.length - 1, 1,);
+            }
+            while (date[0] != '上' && date[0] != '下') {
+                date.splice(0, 1,);
+            }
+            date = date.join('');
+            return date;
+        }
+
+        var DealWithMonth = function (Month) { // 月分後處理
+            Month = [...Month]; // string transfer to array
+
+            for (let x = 0; x <= 4; x++) {
+                Month.splice(0, 1,);
+            }
+            if (Month[0] == '0') {
+                Month.splice(0, 1,);
+            }
+
+            Month = Month.join('');
+            return Month;
+        }
+
+        if (document.getElementById("SearchPeriod").value == 'Year') {
+            SelectYear = document.getElementById("SelectYear").value; 
+            PassTime = SelectYear;
+            QueryMode = 1;
+        }
+        else if (document.getElementById("SearchPeriod").value == 'Month') { // 月分需要後處理
+            SelectMonth = document.getElementById("SelectMonth").value; 
+            PassTime = SelectMonth;
+            QueryMode = 2;
+            PassTime = DealWithMonth(PassTime);
+        }
+        else if (document.getElementById("SearchPeriod").value == 'Day') { // 逐日->後處理
+            SearchDay = document.getElementById("SelectDay").value; 
+            PassTime = SearchDay;
+         
+            PassTime = [...PassTime]; // string to array
+            for (let x = 0; x <= PassTime.length - 1; x++) {
+                if (PassTime[x] == '-' && PassTime[x + 1] == '0') {
+                    PassTime.splice(x+1,1,);
+                }
+            }
+
+            QueryMode = 3;
+            PassTime = PassTime.join("");
+        }
+
+        $.ajax({
+            //緩存
+            cache: false,
+            //同步
+            async: false,
+            //請求資料的方式
+            type: "POST",
+            //server回傳數據的資料類型
+
+            dataType: "json",
+            //contentType: "application/json; charset=utf-8",
+            url: "/Home/History_YearMonth",
+            //data: data,
+            data: {
+                Time: PassTime,
+                Mode: QueryMode
+            },
+
+            success: function (data) {
+                Time = data[0].Time;
+                Power = data[0].Power;
+                // 取至小數點後第二位
+                for (let x = 0; x <= Power.length - 1; x++) { // mode=1~3
+                    Power[x] = Power[x].toFixed(2);
+                }
+                if (QueryMode == 3) { // Time的後處理(逐日)
+                    for (let x = 0; x <= Time.length - 1; x++) {
+                        Time[x] = Plus12ToHour(Time[x]);
+                    }
+                }
+         
+                if (QueryMode == 1 || QueryMode == 2) {
+                    for (let x = 0; x <= Time.length - 1; x++) {
+                        if (QueryMode == 1) {
+                            Time[x] += "月";
+                        }
+                        else if (QueryMode == 2) {
+                            Time[x] += "號";
+                        }
+                    }
+                }
+                
+            }
+        });
+
+        
+        $("#MonthYear_Chart").remove();
+        $("#MonthYear_OUT").append('<div id="MonthYear_Chart"></div>');
+        var options = { // 開源apexchart
+            series: [{
+                name: "Desktops",
+                data: Power
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                //text: 'Product Trends by Month',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: { // 需改成: 沒有上午下午
+                categories: Time,
+                tickAmount: 5
+            },
+            yaxis: {
+                title: {
+                    text: '耗電量(kW)'
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#MonthYear_Chart"), options);
+        chart.render();
+    } // YearMonthQuery()
+</script>
+
+
+
+
+<script>
+    // 輸入起~終 日期範圍, 顯示耗電量圖表(x: 時間, y:耗電量kW)
+
+    function Button() {
+
+        $.ajax({
+            //緩存
+            cache: false,
+            //同步
+            async: false,
+            //請求資料的方式
+            type: "POST",
+            //server回傳數據的資料類型
+            dataType: "json",
+            //contentType: "application/json; charset=utf-8",
+            url: "/Home/HistoryVal_search",
+            //data: data,
+            data: { start: $("#start").val(), end: $("#end").val() },
+
+
+            success: function (data) {
+                Time1 = data[0].Time;
+                Power1 = data[0].Power;
+            }
+        });
+
+        $("#ChartRange").remove();
+        $("#ChartDIV1").append('<div id="ChartRange"></div>');
+
+        var options = { // 開源apexchart
+            series: [{
+                name: "Desktops",
+                data: Power1
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                //text: 'Product Trends by Month',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: { // 需改成: 沒有上午下午
+                categories: Time1,
+                tickAmount: 5,
+                 labels: {
+                    rotate: 0,    //讓你的日期不再傾斜
+                },
+            },
+            yaxis: {
+                title: {
+                    text: '耗電量(kW)',
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#ChartRange"), options);
+        chart.render();
+   
+
+
+
+
+    } // Button()
+</script>

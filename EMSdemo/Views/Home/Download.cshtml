@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "Download";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="body-title">
+    <div class="card-icon">
+        <i class="material-icons">list_alt</i>
+    </div>
+    <h4 class="card-title" style="font-weight:bold;color:#013d66">報表輸出</h4>
+</div>
+<form method="post" action="/Home/ExporttoExcel002">
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div @*class="row"*@ @*id="FirstRow"*@ runat="server" style="width:100%">
+                <div id="a5" class="card" style="background-color: #263238;">
+                    <div class="card-header  card-header-icon  ">
+                        <div style="   background-color: #40E0D0;" class="card-icon">
+                            <i class="fas fa-bar-chart fa-2x"></i>
+                        </div>
+                        <h4 class="card-title" id="waterandelectric_title" style="font-weight:bold;font-size:30px;color:white" runat="server"> Excel報表</h4>
+                        <div class="row" id="FirstRow" runat="server">
+                            <div class="col-md-12">
+                                <div @*class="card"*@ style="  background-color: #9FE2BF;">
+                                    <div class="card-header  card-header-icon card-header-info">
+                                        <br />
+                                        <div class="card-body" style="font-weight:bold;color:black;font-size:23px">
+                                            <div id="DIV_1">
+                                                <div class="row">
+                                                    <label style="background-color:yellowgreen; color:black; font-size:20px; font-weight:bold;"> 開始時間: </label>
+                                                    <input type="date" name="start" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" value="2022-04-01">
+                                                    <label style="background-color:yellowgreen; color:black; font-size:20px; font-weight:bold;"> 結束時間: </label>
+                                                    <input type="date" name="end" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" value="2022-07-05">
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <input class="btn btn-default" type='submit' value="下載" style="font-weight:bold;text-align:right;background-color:#7CB342;" />
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br /> <br />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br /> <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+

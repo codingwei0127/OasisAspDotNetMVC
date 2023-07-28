@@ -1,0 +1,150 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">settings</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">佳化開機策略</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <table class="col-md-10" id="Table_BestMethod" style="font-weight:bold;text-align:center;color:black;border-bottom:2px #000000 solid;">
+                        <tbody>
+                            <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                <td colspan="5">推薦開機模式</td>
+                            </tr>
+                            <tr style="background-color:#EEEEEE;height:40px;">
+                                <td colspan="2" style="background-color:#b2dbf7;">日期</td>
+                                <td colspan="3">
+                                    <script>document.write(new Date().toJSON().slice(0, 10).replace(/-/g, ' / '))</script>
+                                </td>
+                            </tr>
+                            <tr style="background-color:#FAFAFA;height:40px;">
+                                <td colspan="2" style="background-color:#e3f4ff;">平均負載噸數(RT)</td>
+                                <td colspan="3" id="AvgLoad"></td>
+                            </tr>
+                            <tr style="background-color:#EEEEEE;height:40px;">
+                                <td colspan="2" style="background-color:#b2dbf7;">最大負載噸數(RT)</td>
+                                <td colspan="3" id="PeakLoad"></td>
+                            </tr>
+                            <tr style="background-color:#FAFAFA;height:40px;">
+                                <td colspan="2" style="background-color:#e3f4ff;">最大負載時刻</td>
+                                <td colspan="3" id="Time"></td>
+                            </tr>
+                            <tr style="background-color:#EEEEEE;height:40px;">
+                                <td colspan="2" style="background-color:#b2dbf7;">最大負載時刻溫度(℃)</td>
+                                <td colspan="3" id="Temperature"></td>
+                            </tr>
+                            <tr style="background-color:#FAFAFA;height:40px;">
+                                <td colspan="2" style="background-color:#e3f4ff;">最大負載時刻濕度(%)</td>
+                                <td colspan="3" id="Humidity"></td>
+                            </tr>
+
+
+                            <tr style="background-color:#1ba891;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                <td class="col-md-2">CH1</td>
+                                <td class="col-md-2">CH2</td>
+                                <td class="col-md-2">CH3</td>
+                                <td class="col-md-2">CHSP</td>
+                                <td class="col-md-2">性能(kW/RT)</td>
+                            </tr>
+                            <tr style="background-color:#FAFAFA;height:40px;font-size:large;">
+                                <td name="BestOperation"></td>
+                                <td name="BestOperation"></td>
+                                <td name="BestOperation"></td>
+                                <td name="BestOperation"></td>
+                                <td id="BestkWRT"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <table class="col-md-12" id="Table_Method" style="font-weight:bold;text-align:center;color:black;border-bottom:2px #000000 solid;">
+        <thead>
+            <tr style="background-color:rgb(238,135,75);border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                <th colspan="5">
+                <script>document.write(new Date().toJSON().slice(0, 10).replace(/-/g, ' / '))</script> 預測開機模式 (1:開機；0:關機)</th>
+            </tr>
+        </thead>
+        <tbody id="TableTbody">
+            <tr style="background-color:#fcecde;height:40px;">
+                <td class="col-md-2">CH1</td>
+                <td class="col-md-2">CH2</td>
+                <td class="col-md-2">CH3</td>
+                <td class="col-md-2">CHSP</td>
+                <td class="col-md-2">性能(kW/RT)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    document.getElementById("SysOptimizeTitle").classList.add("active");
+    document.getElementById("SysOptimize").classList.add("show");
+    document.getElementById("OperateMethod").classList.add("active");
+    $(document).ready(function () {
+        $().ready(function () {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Optimization/OptiOPVal",
+                success: function (data) {
+                    console.log("LoadData_success");
+                    document.getElementById("AvgLoad").innerText = parseFloat(data[0].AvgLoad).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("PeakLoad").innerText = parseFloat(data[0].PeakLoad).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("Time").innerText = data[0].PeakTime;
+                    document.getElementById("Temperature").innerText = parseFloat(data[0].PeakTdb).toFixed(2);
+                    document.getElementById("Humidity").innerText = parseFloat(data[0].PeakRH).toFixed(2);
+                    document.getElementById("BestkWRT").innerText = parseFloat(data[0].BestKWRT).toFixed(2);
+                    var BestOperation = document.querySelectorAll('td[name=BestOperation]');
+                    for (var i = 0; i < BestOperation.length; i++) {
+                        BestOperation[i].innerText = data[0].BestOpt[i];
+                        if (data[0].BestOpt[i] == "關機") BestOperation[i].style.color = "red";
+                        else BestOperation[i].style.color = "#32c944";
+                    }
+                    //Table Data
+                    for (var i = 0; i < data[0].CH1opt.length; i++) {
+                        var CH1Td = "", CH2Td = "", CH3Td = "", CHSPTd = "";
+                        if (data[0].CH1opt[i] == "開機") CH1Td = '<td style="color:#32c944;">開機</td>';
+                        else CH1Td = '<td style="color:red;">關機</td>';
+                        if (data[0].CH2opt[i] == "開機") CH2Td = '<td style="color:#32c944;">開機</td>';
+                        else CH2Td = '<td style="color:red;">關機</td>';
+                        if (data[0].CH3opt[i] == "開機") CH3Td = '<td style="color:#32c944;">開機</td>';
+                        else CH3Td = '<td style="color:red;">關機</td>';
+                        if (data[0].CHSPopt[i] == "開機") CHSPTd = '<td style="color:#32c944;">開機</td>';
+                        else CHSPTd = '<td style="color:red;">關機</td>';
+                        if (i % 2 == 0) {
+                            $("#TableTbody").append(
+                                '<tr style="background-color:#FAFAFA;height:40px;">' +
+                                CH1Td + CH2Td + CH3Td + CHSPTd +
+                                '<td>' + parseFloat(data[0].KWRT[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                        else {
+                            $("#TableTbody").append(
+                                '<tr style="background-color:#EEEEEE;height:40px;">' +
+                                CH1Td + CH2Td + CH3Td + CHSPTd +
+                                '<td>' + parseFloat(data[0].KWRT[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                    }
+                },
+                error: function (result) {
+                    console.log("LoadData_false");
+                }
+            });
+        });
+    });
+</script>

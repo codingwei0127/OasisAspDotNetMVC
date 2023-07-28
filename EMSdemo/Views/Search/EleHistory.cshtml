@@ -1,0 +1,219 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">flash_on</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">用電歷史查詢</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    起始時間：
+                    <input type="text" class="form-control datepicker" value="" id="start" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    結束時間：
+                    <input type="text" class="form-control datepicker" value="" id="end" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    選擇電盤：
+                    <select class="selectpicker" data-size="5" data-style="btn btn-info btn-fill" title="請選擇電盤" id="equipmentID">
+                        <option disabled="disabled" selected="selected">請選擇電盤</option>
+                        <option value="VCB1">VCB1</option>
+                        <option value="VCB2">VCB2</option>
+                        <option value="VCB3">VCB3</option>
+                        <option value="VCB4">VCB4</option>
+                    </select>
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button onclick="EleHistorySearch()" id="SearchButton" type="button" class="btn btn-fill btn-sm btn-warning" style="font-weight:bold;margin-top:5px;margin-bottom:9px;">查詢</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="EleHistoryReport()" id="OutputButton" type="button" class="btn btn-fill btn-success SearchSuccess" style="font-weight:bold;margin-top:5px;margin-bottom:9px;display:none;">輸出成Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div id="downloadfile"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row SearchSuccess" id="SearchDIV" style="display:none;">
+    <div class="col-md-12">
+        <table class="col-md-12" id="Table_EleHistory">
+            <thead id="TableThead">
+                <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">
+                    <th class="col-md-4">時間</th>
+                    <th class="col-md-4">電功率(kW)</th>
+                    <th class="col-md-4">電錶度數(度)</th>
+                    @*<th class="col-md-2">時間</th>
+                        <th class="col-md-2">電功率(kW)</th>
+                        <th class="col-md-2">電錶度數(度)</th>
+                        <th class="col-md-2">電壓</th>
+                        <th class="col-md-2">電流</th>
+                        <th class="col-md-2">功率因數</th>*@
+                </tr>
+            </thead>
+            <tbody id="TableTbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    document.getElementById("SysSearchTitle").classList.add("active");
+    document.getElementById("SysSearch").classList.add("show");
+    document.getElementById("EleHistory").classList.add("active");
+    $(document).ready(function () {
+        // initialise Datetimepicker and Sliders
+        md.initFormExtendedDatetimepickers();
+        if ($('.slider').length != 0) {
+            md.initSliders();
+        }
+        $("#start").datepicker("setDate", new Date());
+        $('#end').datepicker("setDate", new Date());
+    });
+
+    function EleHistorySearch() {
+        var startdate = document.getElementById("start").value;
+        const startarray = startdate.split("/");
+        var startdateSQL = startarray[2] + "-" + startarray[0] + "-" + startarray[1];
+        var enddate = document.getElementById("end").value;
+        const endarray = enddate.split("/");
+        var enddateSQL = endarray[2] + "-" + endarray[0] + "-" + endarray[1];
+        var option = document.getElementById("equipmentID").value;
+        if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined" && option == "請選擇電盤") {
+            alert("請選取開始、結束時間及欲查詢的電盤");
+            return
+        }
+        if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined") {
+            alert("請選取開始及結束時間");
+            return
+        }
+        if (startdateSQL == "undefined--undefined" && option == "請選擇電盤") {
+            alert("請選取開始時間及欲查詢的電盤");
+            return
+        }
+        if (enddateSQL == "undefined--undefined" && option == "請選擇電盤") {
+            alert("請選取結束時間及欲查詢的電盤");
+            return
+        }
+        if (startdateSQL == "undefined--undefined") {
+            alert("請選取開始時間");
+            return
+        }
+        if (enddateSQL == "undefined--undefined") {
+            alert("請選取結束時間");
+            return
+        }
+        if (option == "請選擇電盤") {
+            alert("請選擇欲查詢的電盤");
+            return
+        }
+        var Time = [];
+        var kW = [];
+        var GagekWh = [];
+        let data = {
+            data: {
+                'startdateSQL': startdateSQL,
+                'enddateSQL': enddateSQL,
+                'option': option,
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Search/EleHistorySearch",
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Search_success");
+                $('.SearchSuccess').show();
+                $('#TableTbody>tr').remove();
+                Time = data[0].Time;
+                kW = data[0].kW;
+                GagekWh = data[0].GagekWh;
+            },
+            error: function (res) {
+                console.log('Search_false');
+            }
+        });
+        for (var i = 0; i < Time.length; i++) {
+            if (i % 2 == 0) {
+                $('#TableTbody').append(
+                    '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                    '<td value="' + Time[i] + '">' + Time[i] + '</td>' +
+                    '<td value="' + kW[i] + '">' + parseFloat(kW[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td>' +
+                    '<td value="' + GagekWh[i] + '">' + parseFloat(GagekWh[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td></tr>'
+                );
+            }
+            else {
+                $('#TableTbody').append(
+                    '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                    '<td value="' + Time[i] + '">' + Time[i] + '</td>' +
+                    '<td value="' + kW[i] + '">' + parseFloat(kW[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td>' +
+                    '<td value="' + GagekWh[i] + '">' + parseFloat(GagekWh[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td></tr>'
+                );
+            }
+        }
+        //Table Hover Event
+        var originColor;
+        $("#TableTbody > tr").hover(function () {
+            originColor = this.style.backgroundColor;
+            this.style.backgroundColor = '#f8e7aa';
+        }, function () {
+            this.style.backgroundColor = originColor;
+        });
+    };
+
+    function EleHistoryReport() {
+        var tbody = document.getElementById("TableTbody");
+        var tbodyrows = tbody.rows.length;
+        var tbodycols = tbody.rows[0].cells.length;
+        var TbodyContent = [];
+        for (var i = 0; i < tbodyrows; i++) {
+            for (j = 0; j < tbodycols; j++) {
+                //TbodyContent.push(tbody.rows[i].cells[j].innerHTML);
+                TbodyContent.push(tbody.rows[i].cells[j].getAttribute("value"));
+            }
+        }
+        var option = document.getElementById("equipmentID").value;
+        var allArrays = [TbodyContent];
+        let data = {
+            data: {
+                'outputType': 'EleHistory',
+                'tbodyrows': tbodyrows,
+                'tbodycols': tbodycols,
+                'option': option,
+            },
+            allArrays: allArrays,
+        }
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional: true,
+            url: "/Home/OutputTableReport",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Output_success");
+                Swal.fire('報表輸出成功', '', 'success');
+                $('#OutputReport').show();
+                document.getElementById("downloadfile").innerHTML = '';
+                $('#downloadfile').append(
+                    '<br/><label>' + data[0].filename + '<label>&nbsp;&nbsp;&nbsp;<a href="/AllReport/EleHistoryReport/' + data[0].filename + '" download = "' + data[0].filename + '"><button type="button" class="btn btn-success btn-sm">下載</button></a>'
+                );
+            },
+            error: function (result) {
+                console.log("Output_false");
+            }
+        });
+    };
+</script>

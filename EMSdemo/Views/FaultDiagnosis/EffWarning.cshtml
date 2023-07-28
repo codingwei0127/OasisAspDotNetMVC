@@ -1,0 +1,217 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">crisis_alert</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">性能異常紀錄查詢</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    起始時間：
+                    <input type="text" class="form-control datepicker" value="" id="start" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    結束時間：
+                    <input type="text" class="form-control datepicker" value="" id="end" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    設備編號：
+                    <select class="selectpicker" data-size="5" data-style="btn btn-info btn-fill" title="請選擇設備" id="equipmentID">
+                        <option disabled="disabled" selected="selected">請選擇設備</option>
+                        <option value="CH1">CH1</option>
+                        <option value="CH2">CH2</option>
+                        <option value="CH3">CH3</option>
+                        <option value="CHSP">CHSP</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button onclick="EffWarningSearch()" id="SearchButton" type="button" class="btn-fill btn btn-warning" style="font-weight:bold;margin-top:5px;margin-bottom:9px;">查詢</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="EffWarningReport()" id="OutputButton" type="button" class="btn btn-fill btn-success SearchSuccess" style="font-weight:bold;margin-top:5px;margin-bottom:9px;display:none;">輸出成Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div id="downloadfile"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row SearchSuccess" id="SearchDIV" style="display:none;">
+    <div class="col-md-12">
+        <table class="col-md-12" id="Table_EffWarning" style="color:black;">
+            <thead id="TableThead">
+                <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">
+                    <th class="col-md-2">時間</th>
+                    <th class="col-md-3">實際性能COP</th>
+                    <th class="col-md-3">基準性能COP</th>
+                    <th class="col-md-4">訊息</th>
+                </tr>
+            </thead>
+            <tbody id="TableTbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    document.getElementById("FaultDiagnosisTitle").classList.add("active");
+    document.getElementById("FaultDiagnosis").classList.add("show");
+    document.getElementById("EffWarning").classList.add("active");
+    $(document).ready(function () {
+        // initialise Datetimepicker and Sliders
+        md.initFormExtendedDatetimepickers();
+        if ($('.slider').length != 0) {
+            md.initSliders();
+        }
+        $("#start").datepicker("setDate", new Date());
+        $('#end').datepicker("setDate", new Date());
+    });
+
+    function EffWarningSearch() {
+        var startdate = document.getElementById("start").value;
+        const startarray = startdate.split("/");
+        var startdateSQL = startarray[2] + "-" + startarray[0] + "-" + startarray[1];
+        var enddate = document.getElementById("end").value;
+        const endarray = enddate.split("/");
+        var enddateSQL = endarray[2] + "-" + endarray[0] + "-" + endarray[1];
+        var option = document.getElementById("equipmentID").value;
+        if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined" && option == "請選擇設備") {
+            alert("請選取開始、結束時間及欲查詢的設備");
+            return
+        }
+        if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined") {
+            alert("請選取開始及結束時間");
+            return
+        }
+        if (startdateSQL == "undefined--undefined" && option == "請選擇設備") {
+            alert("請選取開始時間及欲查詢的設備");
+            return
+        }
+        if (enddateSQL == "undefined--undefined" && option == "請選擇設備") {
+            alert("請選取結束時間及欲查詢的設備");
+            return
+        }
+        if (startdateSQL == "undefined--undefined") {
+            alert("請選取開始時間");
+            return
+        }
+        if (enddateSQL == "undefined--undefined") {
+            alert("請選取結束時間");
+            return
+        }
+        if (option == "請選擇設備") {
+            alert("請選擇欲查詢的設備");
+            return
+        }
+        var Time = [];
+        var RealCOP = [];
+        var BaseLineCOP = [];
+        var Message = [];
+        let data = {
+            data: {
+                'startdateSQL': startdateSQL,
+                'enddateSQL': enddateSQL,
+                'option': option,
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "/FaultDiagnosis/EffWarningSearch",
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Search_success");
+                $('.SearchSuccess').show();
+                $('#TableTbody>tr').remove();
+                Time = data[0].Time;
+                RealCOP = data[0].RealCOP;
+                BaseLineCOP = data[0].BaseLineCOP;
+                Message = data[0].Message;
+            },
+            error: function (res) {
+                console.log('Search_false');
+            }
+        });
+        for (var i = 0; i < Time.length; i++) {
+            if (i % 2 == 0) {
+                $('#TableTbody').append(
+                    '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                    '<td value="' + Time[i] + '">' + Time[i] + '</td>' +
+                    '<td value="' + RealCOP[i] + '">' + parseFloat(RealCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + BaseLineCOP[i] + '">' + parseFloat(BaseLineCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + Message[i] + '">' + Message[i] + '</td></tr>'
+                );
+            }
+            else {
+                $('#TableTbody').append(
+                    '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                    '<td value="' + Time[i] + '">' + Time[i] + '</td>' +
+                    '<td value="' + RealCOP[i] + '">' + parseFloat(RealCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + BaseLineCOP[i] + '">' + parseFloat(BaseLineCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + Message[i] + '">' + Message[i] + '</td></tr>'
+                );
+            }
+        }
+        //Table Hover Event
+        var originColor;
+        $("#TableTbody > tr").hover(function () {
+            originColor = this.style.backgroundColor;
+            this.style.backgroundColor = '#f8e7aa';
+        }, function () {
+            this.style.backgroundColor = originColor;
+        });
+    };
+
+    function EffWarningReport() {
+        var tbody = document.getElementById("TableTbody");
+        var tbodyrows = tbody.rows.length;
+        var tbodycols = tbody.rows[0].cells.length;
+        var TbodyContent = [];
+        for (var i = 0; i < tbodyrows; i++) {
+            for (j = 0; j < tbodycols; j++) {
+                //TbodyContent.push(tbody.rows[i].cells[j].innerHTML);
+                TbodyContent.push(tbody.rows[i].cells[j].getAttribute("value"));
+            }
+        }
+        var option = document.getElementById("equipmentID").value;
+        var allArrays = [TbodyContent];
+        let data = {
+            data: {
+                'outputType': 'EffWarning',
+                'tbodyrows': tbodyrows,
+                'tbodycols': tbodycols,
+                'option': option,
+            },
+            allArrays: allArrays,
+        }
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional: true,
+            url: "/Home/OutputTableReport",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Output_success");
+                Swal.fire('報表輸出成功', '', 'success');
+                $('#OutputReport').show();
+                document.getElementById("downloadfile").innerHTML = '';
+                $('#downloadfile').append(
+                    '<br/><label>' + data[0].filename + '<label>&nbsp;&nbsp;&nbsp;<a href="/AllReport/EffWarningReport/' + data[0].filename + '" download = "' + data[0].filename + '"><button type="button" class="btn btn-success btn-sm">下載</button></a>'
+                );
+            },
+            error: function (result) {
+                console.log("Output_false");
+            }
+        });
+    }
+</script>

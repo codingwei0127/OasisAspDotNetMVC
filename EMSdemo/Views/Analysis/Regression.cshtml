@@ -1,0 +1,237 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">query_stats</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">迴歸資料分析</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <div class="input-group col-md-2" id="SelectMonthDiv"></div>
+                    <select class="selectpicker col-lg-2" data-size="7" data-style="btn btn-info btn-fill" id="LineID" title="請選擇迴歸曲線">
+                        <option disabled="disabled" selected="selected">請選擇迴歸曲線</option>
+                        <option value="PLR_kW">空調主機負載率 - 空調主機用電量需量</option>
+                        <option value="Toa_kW">外氣溫度 - 空調主機用量需量</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="RegressionSearch();" type="button" class="btn btn-fill btn-warning" style="font-weight:bold;">查詢</button>
+                </div>
+                <div class="SearchSuccess" id="SearchDIV" style="display:none;">
+                    <br />
+                    <div class="row">
+                        <label class="col-md-1"></label>
+                        <div class="chart-container col-md-10" id="ChartDIV">
+                            <div id="RegressionChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("SysAnalysisTitle").classList.add("active");
+    document.getElementById("SysAnalysis").classList.add("show");
+    document.getElementById("Regression").classList.add("active");
+    $(document).ready(function () {
+        $().ready(function () {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Analysis/RegressionVal",
+                success: function (data) {
+                    console.log("LoadData_success");
+                    var optionstring = "";
+                    for (var i = 0; i < data[0].Time.length; i++) optionstring = optionstring + '<option value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</option>';
+                    $("#SelectMonthDiv").append(
+                        '<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年月份" data-size="8" id="SearchMonth"><option disabled="disabled" selected="selected">請選擇年月份</option>' + optionstring + '</select>'
+                    );
+                    $('.selectpicker').selectpicker('render');
+                },
+                error: function (result) {
+                    console.log("LoadData_false");
+                }
+            });
+        });
+    });
+
+    function RegressionSearch() {
+        var SearchMonth = document.getElementById("SearchMonth").value;
+        var option = document.getElementById("LineID").value;
+        if (SearchMonth == "請選擇年月份" && option == "請選擇迴歸曲線") {
+            alert("請選擇欲查詢的年月份及迴歸曲線");
+            return
+        }
+        if (SearchMonth == "請選擇年月份") {
+            alert("請選擇欲查詢的年月份");
+            return
+        }
+        if (option == "請選擇迴歸曲線") {
+            alert("請選擇欲查詢的迴歸曲線");
+            return
+        }
+        var ChartData = [];
+        var LineData = [];
+        var AxisX = [];
+        var AxisY = [];
+        var RegressionX = [];
+        var RegressionY = [];
+        var Formula = "", XaxisTitle = "", YaxisTitle = "";
+        var Rsquare = 0;
+        let data = {
+            data: {
+                'SearchMonth': SearchMonth,
+                'option': option,
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Analysis/RegressionSearch",
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Search_success");
+                $(".SearchSuccess").show();
+                $("#RegressionChart").remove();
+                $("#ChartDIV").append('<div id="RegressionChart"></div>');
+                AxisX = data[0].AxisX;
+                AxisY = data[0].AxisY;
+                RegressionX = data[0].RegressionX;
+                RegressionY = data[0].RegressionY;
+                Formula = data[0].Formula;
+                Rsquare = data[0].Rsquare;
+            },
+            error: function (res) {
+                console.log('Search_false');
+            }
+        });
+        for (var i = 0; i < AxisX.length; i++) {
+            var ChartDataArrObj = [];
+            ChartDataArrObj[0] = AxisX[i];
+            ChartDataArrObj[1] = AxisY[i];
+            ChartData.push(ChartDataArrObj);
+        }
+        for (var i = 0; i < RegressionX.length; i++) {
+            var LineDataArrObj = [];
+            LineDataArrObj[0] = RegressionX[i];
+            LineDataArrObj[1] = RegressionY[i];
+            LineData.push(LineDataArrObj);
+        }
+
+        if (option == "PLR_kW")
+        {
+            XaxisTitle = "空調主機負載率(%)";
+            YaxisTitle = "空調主機用電需量(kW)";
+        }
+        else if (option == "Toa_kW") {
+            XaxisTitle = "外氣溫度(℃)";
+            YaxisTitle = "空調主機用電需量(kW)";
+        }
+        var minX = Math.min.apply(null, ChartData.map(function (e) { return e[0] }));
+        var maxX = Math.max.apply(null, ChartData.map(function (e) { return e[0] }));
+        var deltaX = (maxX - minX) / 100;
+
+        var options = {
+            series: [
+                {name: "迴歸線",type: 'line',data: LineData},
+                {name: "散佈圖",type: 'scatter',data: ChartData}
+            ],
+            chart: {
+                height: 500,
+                type: 'line',
+                id: 'Regressionchart',
+                zoom: {
+                    type: 'xy',
+                    enabled: true
+                },
+            },
+            title: {
+                text: option + " 迴歸 » " + Formula + ", 判定係數 R²=" + Rsquare,
+                align: 'center',
+                margin: 10,
+                offsetX: 0,
+                offsetY: 0,
+                floating: false,
+                style: {
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    fontFamily: 'Helvetica',
+                    color: '#263238'
+                },
+            },
+            dataLabels: { enabled: false },
+            colors: ["#0D3B66", "#EE964B"],
+            markers: {
+                size: [0, 6],
+                style: 'hollow',
+            },
+            tooltip: {
+                shared: false,
+                intersect: true,
+                x: {show: false,},
+                y: {
+                    formatter: function (val) {
+                        return (parseFloat(val).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            },
+            toolbar: {
+                csv: {
+                    show: false
+                }
+            },
+            legend: {show: false},
+            xaxis: {
+                type: 'numeric',
+                min: minX - deltaX,
+                max: maxX + deltaX,
+                title: {
+                    text: XaxisTitle,
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 600,
+                    },
+                    offsetY: 5,
+                },
+                labels: {
+                    formatter: function (val) {
+                        return parseFloat(val).toFixed(2)
+                    }
+                },
+                //tooltip: {enabled: false,}
+            },
+            yaxis: {
+                title: {
+                    text: YaxisTitle,
+                    rotate: -90,
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 600,
+                    },
+                    offsetX: -7,
+                },
+                labels: {
+                    formatter: function (val) {
+                        return (parseFloat(val).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#RegressionChart"), options);
+        chart.render();
+    }
+</script>

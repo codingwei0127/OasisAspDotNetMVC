@@ -1,0 +1,283 @@
+﻿
+@{
+    ViewBag.Title = "LightControl";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <style>
+        .bootstrap-select > .dropdown-toggle {
+            position: relative;
+            width: 40%;
+            z-index: 1;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .bootstrap-select .dropdown-toggle .filter-option {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding-top: inherit;
+            padding-right: inherit;
+            padding-bottom: inherit;
+            padding-left: inherit;
+            height: 100%;
+            width: 125%;
+            text-align: left;
+            display: inline;
+        }
+
+        .bootstrap-select:not(.input-group-btn),
+        .bootstrap-select[class*="col-"] {
+            float: none;
+            margin-left: 0;
+            display: inline;
+        }
+    </style>
+</head>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">settings</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">照明即時控制</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <table class="col-md-10" id="Table_BestMethod" style="font-weight:bold;text-align:center;color:black;border-bottom:2px #000000 solid;">
+                        <tbody>
+                            <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                <td style="font-size:large">當前開關狀態</td>
+                                <td style="font-size:large">手動開關設定</td>
+
+                            </tr>
+                            <tr style="background-color:#EEEEEE;height:40px;">
+                                <td id="LightModeNow" style="color: #4682B4; font-size: large; font-weight: bold">開燈</td>
+                                <td>
+                                    <button style="font-size: large; font-weight: bold; background-color: #4682B4; color: #F5FFFA " type="button" class="btn btn-info btn-sm" onclick="LightOn()">開燈</button>
+                                    <button style="font-size: large; font-weight: bold; background-color: #8B4513; color: #F5FFFA " type="button" class="btn btn-info btn-sm" onclick="LightOff()">關燈</button>
+                                </td>
+                            </tr>
+
+
+
+                            <tr style="background-color: rgb(242, 171, 56); border-bottom: 2px #000000 solid; border-top: 2px #000000 solid; color: white; height: 40px;">
+                                <td class="col-md-3" style="font-size:large">今日設定開燈時間</td>
+                                <td class="col-md-3" style="font-size:large">今日設定關燈時間</td>
+                            </tr>
+
+                            <tr style="background-color:#FAFAFA;height:40px;font-size:large;">
+                                <td id="TodayTurnOn" name="BestOperation">下午5:30</td>
+                                <td id="TodayTurnOff" name="BestOperation">下午9:00</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">flash_on</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">歷史開關燈資訊</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @*開源apexchart*@
+                    <label class="col-md-1"></label>
+                    <div class="chart-container col-md-10">
+                        <div id="chart"></div>
+                    </div>
+                </div>@*開源apexchart*@
+            </div>
+        </div>
+    </div>
+</div>
+
+@*chart*@
+<script>
+    var OnOff;
+    var Time;
+
+
+    document.getElementById("HomePage").classList.add("active");
+    $(document).ready(function () {
+        $().ready(function () {
+
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Home/LightHistory",
+                success: function (data) { // 已收到資料
+
+                    OnOff = data[0].OnOff;
+                    Time = data[0].Time;
+                    //顛倒
+                    OnOff = OnOff.reverse();
+                    Time = Time.reverse();
+
+                    function DealWithDateTime(date) {
+                        date = [...date]; // 把字串轉成陣列
+                        for (let x = 0; x <= 4; x++) { // 刪除 '2022/'
+                            date.splice(0, 1,);
+                        }
+
+                        var L = date.length;
+                        for (let x = 1; x <= 3; x++) {
+                            date.splice(L - x, 1,); // 刪除最後面的元素
+                        }
+
+                        date = date.join('');
+                        return date;
+                    }
+
+                    for (let x = 0; x <= Time.length - 1; x++) {
+                        Time[x] = DealWithDateTime(Time[x]);
+                    }
+                }
+            });
+
+            var options = { // 開源apexchart
+                series: [{
+                    name: "Desktops",
+                    data: OnOff
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar',
+
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'straight'
+                },
+                title: {
+                    //text: 'Product Trends by Month',
+                    align: 'left'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: Time,
+                    tickAmount: 5
+                },
+                yaxis: {
+                    title: {
+                        text: '開燈/關燈',
+                    }
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+        });
+    });
+</script>
+
+
+<script>
+    var LightMode = "-1"; // 初始值
+
+    function LightOn() { // 開燈
+
+        // ajax傳送給Controller
+        LightMode = "2";
+
+        let data = {
+            data: {
+                'LightMode': LightMode
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/In",
+            data: data,
+        });
+
+        // 即時顯示當前開關狀態
+        document.getElementById("LightModeNow").innerHTML = "開燈";
+    }
+
+    function LightOff() { // 關燈
+
+        // ajax傳送給Controller
+        LightMode = "1";
+
+        let data = {
+            data: {
+                'LightMode': LightMode
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/In",
+            data: data,
+        });
+
+        // 即時顯示當前開關狀態
+        document.getElementById("LightModeNow").innerHTML = "關燈";
+    }
+</script>
+
+<script>
+    $.ajax({
+        type: "POST",//Request type
+        dataType: "json",//把從後台撈到的資料轉換成預期的資料類型
+        url: "/Home/LightHistory",
+        success: function (data) {
+
+            var LightModeNow;
+            if (data[0].OnOff[0] == 2) {
+                LightModeNow = "開燈";
+            }
+            else if (data[0].OnOff[0] == 1) {
+                LightModeNow = "關燈";
+            }
+
+            document.getElementById("LightModeNow").innerHTML = LightModeNow;
+        }
+    });
+</script>
+
+@*今日設定開燈時間*@
+<script>
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "/Home/schedule_sql",
+        success: function (data) {
+            var d = new Date();
+            var n = d.getDay(); // 0~6 星期日~星期六
+            document.getElementById("TodayTurnOn").innerHTML = (data[0].Light_Time)[(n + 1) * 4 - 4] + " 點 " + (data[0].Light_Time)[(n + 1) * 4 - 3] + " 分 ";
+            document.getElementById("TodayTurnOff").innerHTML = (data[0].Light_Time)[(n + 1) * 4 - 2] + " 點 " + (data[0].Light_Time)[(n + 1) * 4 - 1] + " 分 ";           
+        }      
+    });
+</script>

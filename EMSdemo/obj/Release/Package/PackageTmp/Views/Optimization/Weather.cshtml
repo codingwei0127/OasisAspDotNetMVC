@@ -1,0 +1,266 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="chart-container col-md-11">
+                        <div id="Tdb"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="chart-container col-md-11">
+                        <div id="RH"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <table class="col-md-12" id="Table_OA" style="font-weight:bold;text-align:center;color:black;">
+        <thead>
+            <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                <th>
+                <script>document.write(new Date().toJSON().slice(0, 10).replace(/-/g, ' / '))</script></th>
+                <th>攝氏溫度(°C)</th>
+                <th>相對濕度(％)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background-color:#EEEEEE;height:40px;">
+                <td style="background-color:#b2dbf7;">上午 07:00:00</td>
+                <td name="Temperature"></td>
+                <td name="Humidity"></td>
+            </tr>
+            <tr style="background-color:#FAFAFA;height:40px;">
+                <td style="background-color:#e3f4ff;">上午 10:00:00</td>
+                <td name="Temperature"></td>
+                <td name="Humidity"></td>
+            </tr>
+            <tr style="background-color:#EEEEEE;height:40px;">
+                <td style="background-color:#b2dbf7;">下午 01:00:00</td>
+                <td name="Temperature"></td>
+                <td name="Humidity"></td>
+            </tr>
+            <tr style="background-color:#FAFAFA;border-bottom:2px #000000 solid;height:40px;">
+                <td style="background-color:#e3f4ff;">下午 04:00:00</td>
+                <td name="Temperature"></td>
+                <td name="Humidity"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    document.getElementById("SysOptimizeTitle").classList.add("active");
+    document.getElementById("SysOptimize").classList.add("show");
+    document.getElementById("WeatherData").classList.add("active");
+    $(document).ready(function () {
+        $().ready(function () {
+            var OATdb = [];
+            var OARH = [];
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Optimization/WeatherVal",
+                success: function (data) {
+                    console.log("LoadData_success");
+                    var Temperature = document.querySelectorAll('td[name=Temperature]');
+                    for (var i = 0; i < Temperature.length; i++) Temperature[i].innerText = parseFloat(data[0].Tdb[i]).toFixed(2);
+                    var Humidity = document.querySelectorAll('td[name=Humidity]');
+                    for (var i = 0; i < Humidity.length; i++) Humidity[i].innerText = parseFloat(data[0].RH[i]).toFixed(2);
+                    //Chart Data
+                    for (var i = 0; i < data[0].Time.length; i++) {
+                        let localeTime = data[0].Time[i];
+                        const localeTimeObj = new Date(localeTime).getTime() + 8 * 60 * 60 * 1000;
+
+                        var OATdbArrObj = [];
+                        OATdbArrObj[0] = localeTimeObj;
+                        OATdbArrObj[1] = data[0].Tdb[i];
+                        OATdb.push(OATdbArrObj);
+
+                        var OARHArrObj = [];
+                        OARHArrObj[0] = localeTimeObj;
+                        OARHArrObj[1] = data[0].RH[i];
+                        OARH.push(OARHArrObj);
+                    }
+                },
+                error: function (result) {
+                    console.log("LoadData_false");
+                }
+            });
+
+            var Tdboptions = {
+                chart: {
+                    type: 'line',
+                    id: 'Tdbchart',
+                    height: 300,
+                    zoom: { enabled: false },
+                },
+                title: {
+                    text: "外氣溫度",
+                    style: {
+                        fontSize: '20px',
+                        fontWeight: 600,
+                    },
+                },
+                dataLabels: { enabled: true },
+                colors: ["#0D3B66"],
+                markers: {
+                    size: 0,
+                    style: 'hollow',
+                },
+                stroke: { curve: 'smooth' },
+                yaxis: {
+                    title: {
+                        text: "溫度(℃)",
+                        style: {
+                            fontSize: '16px',
+                            fontWeight: 600,
+                        },
+                        offsetY: 10,
+                    },
+                    labels: {
+                        formatter: function (val) {
+                            return (parseFloat(val).toFixed(2)).toString();
+                        }
+                    }
+                },
+                xaxis: {
+                    type: 'datetime',
+                    min: OATdb[0][0] - 5*60*1000,
+                    max: OATdb[OATdb.length-1][0] + 5*60*1000,
+                    title: {
+                        text: "時間",
+                        style: {
+                            fontSize: '16px',
+                            fontWeight: 600,
+                        },
+                        offsetY: 5,
+                    },
+                    labels: {
+                        datetimeFormatter: { year: 'yyyy', month: 'yyyy-MM', day: 'MM-dd', hour: 'HH:mm' }
+                    },
+                    tooltip: { enabled: false, }
+                },
+                tooltip: {
+                    x: { format: 'yyyy-MM-dd HH:mm' },
+                    y: {
+                        formatter: function (val) {
+                            return (parseFloat(val).toFixed(2)).toString();
+                        }
+                    }
+                },
+                noData: {
+                    text: "Loading...",
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    offsetX: 0,
+                    offsetY: -30,
+                    style: {
+                        color: "#000000",
+                        fontSize: '20px',
+                        fontFamily: "Helvetica"
+                    }
+                },
+                series: [
+                    { name: "外氣溫度", data: OATdb }
+                ],
+            };
+            var Tdbchart = new ApexCharts(document.querySelector("#Tdb"), Tdboptions);
+            Tdbchart.render();
+
+            var RHoptions = {
+                chart: {
+                    type: 'line',
+                    id: 'RHchart',
+                    height: 300,
+                    zoom: { enabled: false },
+                },
+                title: {
+                    text: "相對濕度",
+                    style: {
+                        fontSize: '20px',
+                        fontWeight: 600,
+                    },
+                },
+                dataLabels: { enabled: true },
+                colors: ["#1CD5B6"],
+                markers: {
+                    size: 0,
+                    style: 'hollow',
+                },
+                stroke: { curve: 'smooth' },
+                yaxis: {
+                    title: {
+                        text: "濕度(%)",
+                        style: {
+                            fontSize: '16px',
+                            fontWeight: 600,
+                        },
+                        offsetY: 10,
+                    },
+                    labels: {
+                        formatter: function (val) {
+                            return (parseFloat(val).toFixed(2)).toString();
+                        }
+                    }
+                },
+                xaxis: {
+                    type: 'datetime',
+                    min: OARH[0][0] - 5*60*1000,
+                    max: OARH[OARH.length-1][0] + 5*60*1000,
+                    title: {
+                        text: "時間",
+                        style: {
+                            fontSize: '16px',
+                            fontWeight: 600,
+                        },
+                        offsetY: 5,
+                    },
+                    labels: {
+                        datetimeFormatter: { year: 'yyyy', month: 'yyyy-MM', day: 'MM-dd', hour: 'HH:mm' }
+                    },
+                    tooltip: { enabled: false, }
+                },
+                tooltip: {
+                    x: { format: 'yyyy-MM-dd HH:mm' },
+                    y: {
+                        formatter: function (val) {
+                            return (parseFloat(val).toFixed(2)).toString();
+                        }
+                    }
+                },
+                noData: {
+                    text: "Loading...",
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    offsetX: 0,
+                    offsetY: -30,
+                    style: {
+                        color: "#000000",
+                        fontSize: '20px',
+                        fontFamily: "Helvetica"
+                    }
+                },
+                series: [
+                    { name: "相對濕度", data: OARH }
+                ],
+            };
+            var RHchart = new ApexCharts(document.querySelector("#RH"), RHoptions);
+            RHchart.render();
+        });
+    });
+</script>

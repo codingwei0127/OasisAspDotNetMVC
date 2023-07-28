@@ -1,0 +1,358 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">query_stats</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">性能基準分析</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <div class="input-group col-md-2" id="SelectMonthDiv"></div>
+                    <select class="selectpicker col-lg-2" data-size="5" data-style="btn btn-info btn-fill" id="equipmentID" title="請選擇冰水主機">
+                        <option disabled="disabled">請選擇冰水主機</option>
+                        <option value="CH1">CH1</option>
+                        <option value="CH2">CH2</option>
+                        <option value="CH3">CH3</option>
+                        <option value="CHSP">CHSP</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="COPBaselineSearch()" id="SearchButton" type="button" class="btn btn-fill btn-warning" style="font-weight:bold;">查詢</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="COPBaselineReport()" id="OutputButton" type="button" class="btn btn-fill btn-success SearchSuccess" style="font-weight:bold;display:none;">輸出成Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    <label class="col-md-1"></label>
+                    <div id="downloadfile"></div>
+                </div>
+                <div class="SearchSuccess" id="SearchDIV" style="display:none;">
+                    <br />
+                    <div class="row">
+                        <label class="col-md-1"></label>
+                        <div class="chart-container col-md-10" id="ChartDIV">
+                            <div id="COPBaselineChart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <table class="col-md-12" id="Table_COPBaseline" style="font-weight:bold;text-align:center;color:black;border-bottom:2px #000000 solid;">
+                            <thead id="TableThead">
+                                <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                    <th class="col-md-2">時間</th>
+                                    <th class="col-md-2">實際COP</th>
+                                    <th class="col-md-2">基準COP</th>
+                                    <th class="col-md-2">差異率(%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="TableTbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("SysAnalysisTitle").classList.add("active");
+    document.getElementById("SysAnalysis").classList.add("show");
+    document.getElementById("COPBaseLine").classList.add("active");
+    $(document).ready(function () {
+        $().ready(function () {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Analysis/COPBaseLineVal",
+                success: function (data) {
+                    console.log("LoadData_success");
+                    console.log(data);
+                    var optionstring = "";
+                    for (var i = 0; i < data[0].Time.length; i++) optionstring = optionstring + '<option value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</option>';
+                    $("#SelectMonthDiv").append(
+                        '<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年月份" data-size="8" id="SearchMonth"><option disabled="disabled" selected="selected">請選擇年月份</option>' + optionstring + '</select>'
+                    );
+                    $('.selectpicker').selectpicker('render');
+                },
+                error: function (result) {
+                    console.log("LoadData_false");
+                }
+            });
+        });
+    });
+
+    function COPBaselineSearch() {
+        var SearchMonth = document.getElementById("SearchMonth").value;
+        var SelectedCH = document.getElementById("equipmentID").value;
+        if (SearchMonth == "請選擇年月份" && SelectedCH == "請選擇冰水主機") {
+            alert("請選擇欲查詢的年月份及冰水主機");
+            return
+        }
+        if (SearchMonth == "請選擇年月份") {
+            alert("請選擇欲查詢的年月份");
+            return
+        }
+        if (SelectedCH == "請選擇冰水主機") {
+            alert("請選擇欲查詢的冰水主機");
+            return
+        }
+        var Time = [];
+        var ChartActualCOP = [];
+        var ChartBaselineCOP = [];
+        var ActualCOP = [];
+        var BaselineCOP = [];
+        var COPRate = [];
+        var TextColor = [];
+        let data = {
+            data: {
+                'SearchMonth': SearchMonth,
+                'SelectedCH': SelectedCH,
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Analysis/COPBaseLineSearch",
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Search_success");
+                $(".SearchSuccess").show();
+                $('#TableTbody>tr').remove();
+                $("#COPBaselineChart").remove();
+                $("#ChartDIV").append('<div id="COPBaselineChart"></div>');
+                Time = data[0].Time;
+                ActualCOP = data[0].ActualCOP;
+                BaselineCOP = data[0].BaselineCOP;
+                COPRate = data[0].COPRate;
+                TextColor = data[0].TextColor;
+            },
+            error: function (res) {
+                console.log('Search_false');
+            }
+        });
+
+        //Table Data
+        for (var i = 0; i < Time.length; i++) {
+            if (i % 2 == 0) {
+                $('#TableTbody').append(
+                    '<tr style="background-color:#FAFAFA;color:' + TextColor[i] + ';height:40px;text-align:center;">' +
+                    '<td value="' + Time[i] + '">' + Time[i] + '</td>' +
+                    '<td value="' + ActualCOP[i] + '">' + parseFloat(ActualCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + BaselineCOP[i] + '">' + parseFloat(BaselineCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + COPRate[i] + '">' + parseFloat(COPRate[i]).toFixed(2) + '</td></tr>'
+                );
+            }
+            else {
+                $('#TableTbody').append(
+                    '<tr style="background-color:#EEEEEE;color:' + TextColor[i] + ';height:40px;text-align:center;">' +
+                    '<td value="' + Time[i] + '">' + Time[i] + '</td>' +
+                    '<td value="' + ActualCOP[i] + '">' + parseFloat(ActualCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + BaselineCOP[i] + '">' + parseFloat(BaselineCOP[i]).toFixed(2) + '</td>' +
+                    '<td value="' + COPRate[i] + '">' + parseFloat(COPRate[i]).toFixed(2) + '</td></tr>'
+                );
+            }
+        }
+        //Table Hover Event
+        var originColor;
+        $("#TableTbody > tr").hover(function () {
+            originColor = this.style.backgroundColor;
+            this.style.backgroundColor = '#f8e7aa';
+        }, function () {
+            this.style.backgroundColor = originColor;
+        });
+
+        //Chart Data
+        for (var i = 0; i < Time.length; i++) {
+            let localeTime = Time[i];
+            //const localeTimeObj = new Date(localeTime).getTime() + 8*60*60*1000;
+            const localeTimeObj = new Date(localeTime).getTime();
+
+            var ActualCOPArrObj = [];
+            ActualCOPArrObj[0] = localeTimeObj;
+            if (ActualCOP[i] == 0) ActualCOPArrObj[1] = null;
+            else ActualCOPArrObj[1] = ActualCOP[i];
+            //ActualCOPArrObj[1] = ActualCOP[i];
+            ChartActualCOP.push(ActualCOPArrObj);
+
+            var BaselineCOPArrObj = [];
+            BaselineCOPArrObj[0] = localeTimeObj;
+            if (BaselineCOP[i] == 0) BaselineCOPArrObj[1] = null;
+            else BaselineCOPArrObj[1] = BaselineCOP[i];
+            //BaselineCOPArrObj[1] = BaselineCOP[i];
+            ChartBaselineCOP.push(BaselineCOPArrObj);
+        }
+
+        var minActualCOP = Math.min.apply(null, ActualCOP.filter(Boolean));
+        var maxActualCOP = Math.max.apply(null, ActualCOP.filter(Boolean));
+        var minBaselineCOP = Math.min.apply(null, BaselineCOP.filter(Boolean));
+        var maxBaselineCOP = Math.max.apply(null, BaselineCOP.filter(Boolean));
+        var minCOP = 0, maxCOP = 0, deltaCOP = 0;
+        if (minActualCOP < minBaselineCOP) minCOP = minActualCOP;
+        else if (minBaselineCOP < minActualCOP) minCOP = minBaselineCOP;
+        //if (minCOP < 0) minCOP = 0;
+        if (maxActualCOP > maxBaselineCOP) maxCOP = maxActualCOP;
+        else if (maxBaselineCOP < maxActualCOP) maxCOP = maxBaselineCOP;
+        //if (maxCOP < 0) maxCOP = 0;
+        deltaCOP = (maxCOP - minCOP) / 10;
+        if (minCOP - deltaCOP < 0) minCOP = 0;
+        else minCOP = minCOP - deltaCOP;
+
+        var options = {
+            chart: {
+                type: 'line',
+                id: 'COPchart',
+                height: 400,
+                zoom: {
+                    type: 'x',
+                    enabled: true,
+                    autoScaleYaxis: true
+                }
+            },
+            title: {
+                text: SelectedCH,
+                align: 'center',
+                margin: 10,
+                offsetX: 0,
+                offsetY: 0,
+                floating: false,
+                style: {
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    fontFamily: 'Helvetica',
+                    color: '#263238'
+                },
+            },
+            dataLabels: { enabled: false },
+            colors: ["#0D3B66", "#EE964B"],
+            markers: {
+                size: 7,
+                style: 'hollow',
+            },
+            yaxis: {
+                min: minCOP,
+                max: maxCOP + deltaCOP,
+                title: {
+                    text: "COP",
+                    rotate: 0,
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 600,
+                    },
+                    offsetX: -10,
+                },
+                labels: {
+                    formatter: function (val) {
+                        return (parseFloat(val).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            },
+            xaxis: {
+                type: 'datetime',
+                //min: ChartActualCOP[0][0] - 24*3600*1000,
+                //max: ChartActualCOP[ChartActualCOP.length - 1][0] + 24*3600*1000,
+                title: {
+                    text: "時間",
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 600,
+                    },
+                    offsetY: 5,
+                },
+                labels: {
+                    datetimeFormatter: { year: 'yyyy-MM-dd', month: 'MM-dd', day: 'MM-dd' }
+                },
+                tooltip: { enabled: false, }
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'center',
+                tooltipHoverFormatter: function (val, opts) {
+                    return val + ' ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
+                }
+            },
+            tooltip: {
+                x: { format: 'yyyy-MM-dd' },
+                y: {
+                    formatter: function (val) {
+                        return (parseFloat(val).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            },
+            noData: {
+                text: "Loading...",
+                align: 'center',
+                verticalAlign: 'middle',
+                offsetX: 0,
+                offsetY: -30,
+                style: {
+                    color: "#000000",
+                    fontSize: '20px',
+                    fontFamily: "Helvetica"
+                }
+            },
+            //series: [],
+            series: [
+                { name: "實際COP", data: ChartActualCOP },
+                { name: "基準COP", data: ChartBaselineCOP }
+            ],
+        };
+        var chart = new ApexCharts(document.querySelector("#COPBaselineChart"), options);
+        chart.render();
+    }
+
+    function COPBaselineReport() {
+        var tbody = document.getElementById("TableTbody");
+        var tbodyrows = tbody.rows.length;
+        var tbodycols = tbody.rows[0].cells.length;
+        var TbodyContent = [];
+        for (var i = 0; i < tbodyrows; i++) {
+            for (j = 0; j < tbodycols; j++) {
+                //TbodyContent.push(tbody.rows[i].cells[j].innerHTML);
+                TbodyContent.push(tbody.rows[i].cells[j].getAttribute("value"));
+            }
+        }
+        var SelectedCH = document.getElementById("equipmentID").value;
+        var allArrays = [TbodyContent];
+        let data = {
+            data: {
+                'outputType': 'COPBaseline',
+                'tbodyrows': tbodyrows,
+                'tbodycols': tbodycols,
+                'SelectedCH': SelectedCH,
+            },
+            allArrays: allArrays,
+        }
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional: true,
+            url: "/Home/OutputTableReport",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Output_success");
+                Swal.fire('報表輸出成功', '', 'success');
+                $('#OutputReport').show();
+                document.getElementById("downloadfile").innerHTML = '';
+                $('#downloadfile').append(
+                    '<br/><label>' + data[0].filename + '<label>&nbsp;&nbsp;&nbsp;<a href="/AllReport/COPBaselineReport/' + data[0].filename + '" download = "' + data[0].filename + '"><button type="button" class="btn btn-success btn-sm">下載</button></a>'
+                );
+            },
+            error: function (result) {
+                console.log("Output_false");
+            }
+        });
+    }
+</script>

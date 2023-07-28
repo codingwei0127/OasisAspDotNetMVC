@@ -1,0 +1,1068 @@
+﻿
+@{
+    ViewBag.Title = "AirControl";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*head標籤*@
+<head>
+    <style>
+        .bootstrap-select > .dropdown-toggle {
+            position: relative;
+            width: 40%;
+            z-index: 1;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .bootstrap-select .dropdown-toggle .filter-option {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding-top: inherit;
+            padding-right: inherit;
+            padding-bottom: inherit;
+            padding-left: inherit;
+            height: 100%;
+            width: 125%;
+            text-align: left;
+            display: inline;
+        }
+
+        .bootstrap-select:not(.input-group-btn),
+        .bootstrap-select[class*="col-"] {
+            float: none;
+            margin-left: 0;
+            display: inline;
+        }
+    </style>
+</head>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">dvr</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">空調即時控制</h4>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-pills nav-pills-info" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#AC1" role="tablist" style="font-weight:bold;color:#013d66">B1F</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#AC2" role="tablist" style="font-weight:bold;color:#013d66">1F-1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#AC3" role="tablist" style="font-weight:bold;color:#013d66">1F-2</a>
+                    </li>
+
+                    @*複製貼上*@
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#AC4" role="tablist" style="font-weight:bold;color:#013d66">2F-1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#AC5" role="tablist" style="font-weight:bold;color:#013d66">2F-2</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#AC6" role="tablist" style="font-weight:bold;color:#013d66">2F-3</a>
+                    </li>
+                </ul>
+
+
+                @*工作排程表格*@
+                <div class="tab-content tab-space">
+
+                    <div class="col-md-12 tab-pane active table-responsive" id="AC1">
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-2">目前開關狀態</th>
+                                        <th class="col-md-2">目前設定溫度</th>
+                                        <th class="col-md-2">目前設定風量</th>
+                                        <th class="col-md-2">設定開關狀態</th>
+                                        <th class="col-md-2">設定溫度</th>
+                                        <th class="col-md-2">設定風量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td id="Now_AC1_OnOff" style="font-size:20px">ON</td>
+                                        <td id="Now_AC1_Temp" style="font-size:20px">23°C</td>
+                                        <td id="Now_AC1_Speed" style="font-size:20px">強風</td>
+
+
+                                        <td>
+                                            <select id="AC1_OnOff" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="0">OFF</option>
+                                                <option value="1">ON</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC1_Temp" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC1_Speed" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="1">微風</option>
+                                                <option value="3">弱風</option>
+                                                <option value="4">強風</option>
+                                            </select>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <img src="~/Content/assets/img/B1F.png" style="width:100%; height:50%"/>
+                        </div>
+
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="AC1_BUTTON()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 tab-pane table-responsive" id="AC2">
+                        @*2號冷氣排程*@
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-2">目前開關狀態</th>
+                                        <th class="col-md-2">目前設定溫度</th>
+                                        <th class="col-md-2">目前設定風量</th>
+                                        <th class="col-md-2">設定開關狀態</th>
+                                        <th class="col-md-2">設定溫度</th>
+                                        <th class="col-md-2">設定風量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td id="Now_AC2_OnOff" style="font-size:20px">ON</td>
+                                        <td id="Now_AC2_Temp" style="font-size:20px">23°C</td>
+                                        <td id="Now_AC2_Speed" style="font-size:20px">強風</td>
+
+
+                                        <td>
+
+                                            <select id="AC2_OnOff" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">OFF</option>
+                                                <option value="1">ON</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC2_Temp" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC2_Speed" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="1">微風</option>
+                                                <option value="3">弱風</option>
+                                                <option value="4">強風</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <img src="~/Content/assets/img/1F-1.png" style="width:100%; height:50%" />
+
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="AC2_BUTTON()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 tab-pane table-responsive" id="AC3">
+                        @*3號冷氣排程*@
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-2">目前開關狀態</th>
+                                        <th class="col-md-2">目前設定溫度</th>
+                                        <th class="col-md-2">目前設定風量</th>
+                                        <th class="col-md-2">設定開關狀態</th>
+                                        <th class="col-md-2">設定溫度</th>
+                                        <th class="col-md-2">設定風量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td id="Now_AC3_OnOff" style="font-size:20px">ON</td>
+                                        <td id="Now_AC3_Temp" style="font-size:20px">23°C</td>
+                                        <td id="Now_AC3_Speed" style="font-size:20px">強風</td>
+
+
+                                        <td>
+
+                                            <select id="AC3_OnOff" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">OFF</option>
+                                                <option value="1">ON</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC3_Temp" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC3_Speed" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="1">微風</option>
+                                                <option value="3">弱風</option>
+                                                <option value="4">強風</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <img src="~/Content/assets/img/1F-2.png" style="width:100%; height:50%" />
+
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="AC3_BUTTON()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 tab-pane table-responsive" id="AC4">
+                        @*4號冷氣排程*@
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-2">目前開關狀態</th>
+                                        <th class="col-md-2">目前設定溫度</th>
+                                        <th class="col-md-2">目前設定風量</th>
+                                        <th class="col-md-2">設定開關狀態</th>
+                                        <th class="col-md-2">設定溫度</th>
+                                        <th class="col-md-2">設定風量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td id="Now_AC4_OnOff" style="font-size:20px">ON</td>
+                                        <td id="Now_AC4_Temp" style="font-size:20px">23°C</td>
+                                        <td id="Now_AC4_Speed" style="font-size:20px">強風</td>
+
+
+                                        <td>
+
+                                            <select id="AC4_OnOff" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">OFF</option>
+                                                <option value="1">ON</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC4_Temp" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC4_Speed" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="1">微風</option>
+                                                <option value="3">弱風</option>
+                                                <option value="4">強風</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <img src="~/Content/assets/img/2F-1.png" style="width:100%; height:50%" />
+
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="AC4_BUTTON()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 tab-pane table-responsive" id="AC5">
+                        @*5號冷氣排程*@
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-2">目前開關狀態</th>
+                                        <th class="col-md-2">目前設定溫度</th>
+                                        <th class="col-md-2">目前設定風量</th>
+                                        <th class="col-md-2">設定開關狀態</th>
+                                        <th class="col-md-2">設定溫度</th>
+                                        <th class="col-md-2">設定風量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td id="Now_AC5_OnOff" style="font-size:20px">ON</td>
+                                        <td id="Now_AC5_Temp" style="font-size:20px">23°C</td>
+                                        <td id="Now_AC5_Speed" style="font-size:20px">強風</td>
+
+
+                                        <td>
+
+                                            <select id="AC5_OnOff" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">OFF</option>
+                                                <option value="1">ON</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC5_Temp" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC5_Speed" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="1">微風</option>
+                                                <option value="3">弱風</option>
+                                                <option value="4">強風</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <img src="~/Content/assets/img/2F-2.png" style="width:100%; height:50%" />
+
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="AC5_BUTTON()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 tab-pane table-responsive" id="AC6">
+                        @*6號冷氣排程*@
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-2">目前開關狀態</th>
+                                        <th class="col-md-2">目前設定溫度</th>
+                                        <th class="col-md-2">目前設定風量</th>
+                                        <th class="col-md-2">設定開關狀態</th>
+                                        <th class="col-md-2">設定溫度</th>
+                                        <th class="col-md-2">設定風量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td id="Now_AC6_OnOff" style="font-size:20px">ON</td>
+                                        <td id="Now_AC6_Temp" style="font-size:20px">23°C</td>
+                                        <td id="Now_AC6_Speed" style="font-size:20px">強風</td>
+
+
+                                        <td>
+
+                                            <select id="AC6_OnOff" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">OFF</option>
+                                                <option value="1">ON</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC6_Temp" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+
+
+                                        </td>
+                                        <td>
+
+                                            <select id="AC6_Speed" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="1">微風</option>
+                                                <option value="3">弱風</option>
+                                                <option value="4">強風</option>
+
+
+                                            </select>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <img src="~/Content/assets/img/2F-3.png" style="width:100%; height:50%" />
+
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="AC6_BUTTON()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // 即時控制冷氣: 開關/溫度/風量
+
+    function AC1_BUTTON() {
+
+        var AC1_OnOff = document.getElementById('AC1_OnOff').value;
+        var AC1_Temp = document.getElementById('AC1_Temp').value;
+        var AC1_Speed = document.getElementById('AC1_Speed').value;
+
+        var NowOnOff, NowSpeed;
+        if (AC1_OnOff == "0") { // 開關機
+            NowOnOff = "OFF";
+        }
+        else if (AC1_OnOff == "1") {
+            NowOnOff = "ON";
+        }
+
+        if (AC1_Speed == 7 || AC1_Speed == 5) { // 風量
+            NowSpeed = "自動";
+        }
+        else if (AC1_Speed == 1) {
+            NowSpeed = "微風";
+        }
+        else if (AC1_Speed == 3) {
+            NowSpeed = "弱風";
+        }
+        else if (AC1_Speed == 4) {
+            NowSpeed = "強風";
+        }
+
+
+        document.getElementById('Now_AC1_OnOff').innerHTML = NowOnOff; // 儲存設定->即時顯示
+        document.getElementById('Now_AC1_Temp').innerHTML = AC1_Temp + " °C";
+        document.getElementById('Now_AC1_Speed').innerHTML = NowSpeed;
+
+        let data = {
+            data: {
+                'AC1_OnOff': AC1_OnOff,
+                'AC1_Temp': AC1_Temp,
+                'AC1_Speed': AC1_Speed
+            }
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/AC1_Control",
+            data: data
+        });
+    }
+
+    function AC2_BUTTON() {
+
+        var AC2_OnOff = document.getElementById('AC2_OnOff').value;
+        var AC2_Temp = document.getElementById('AC2_Temp').value;
+        var AC2_Speed = document.getElementById('AC2_Speed').value;
+        //
+        var NowOnOff, NowSpeed;
+        if (AC2_OnOff == "0") { // 開關機
+            NowOnOff = "OFF";
+        }
+        else if (AC2_OnOff == "1") {
+            NowOnOff = "ON";
+        }
+
+        if (AC2_Speed == 7 || AC2_Speed == 5) { // 風量
+            NowSpeed = "自動";
+        }
+        else if (AC2_Speed == 1) {
+            NowSpeed = "微風";
+        }
+        else if (AC2_Speed == 3) {
+            NowSpeed = "弱風";
+        }
+        else if (AC2_Speed == 4) {
+            NowSpeed = "強風";
+        } 
+
+        document.getElementById('Now_AC2_OnOff').innerHTML = NowOnOff; // 儲存設定->即時顯示
+        document.getElementById('Now_AC2_Temp').innerHTML = AC2_Temp + " °C";
+        document.getElementById('Now_AC2_Speed').innerHTML = NowSpeed;
+
+        //
+        let data = {
+            data: {
+                'AC2_OnOff': AC2_OnOff,
+                'AC2_Temp': AC2_Temp,
+                'AC2_Speed': AC2_Speed
+            }
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/AC2_Control",
+            data: data
+        });
+    }
+    function AC3_BUTTON() {
+
+        var AC3_OnOff = document.getElementById('AC3_OnOff').value;
+        var AC3_Temp = document.getElementById('AC3_Temp').value;
+        var AC3_Speed = document.getElementById('AC3_Speed').value;
+        //
+        var NowOnOff, NowSpeed;
+        if (AC3_OnOff == "0") { // 開關機
+            NowOnOff = "OFF";
+        }
+        else if (AC3_OnOff == "1") {
+            NowOnOff = "ON";
+        }
+
+        if (AC3_Speed == 7 || AC3_Speed == 5) { // 風量
+            NowSpeed = "自動";
+        }
+        else if (AC3_Speed == 1) {
+            NowSpeed = "微風";
+        }
+        else if (AC3_Speed == 3) {
+            NowSpeed = "弱風";
+        }
+        else if (AC3_Speed == 4) {
+            NowSpeed = "強風";
+        }
+
+        document.getElementById('Now_AC3_OnOff').innerHTML = NowOnOff; // 儲存設定->即時顯示
+        document.getElementById('Now_AC3_Temp').innerHTML = AC3_Temp + " °C";
+        document.getElementById('Now_AC3_Speed').innerHTML = NowSpeed;
+
+        
+        let data = {
+            data: {
+                'AC3_OnOff': AC3_OnOff,
+                'AC3_Temp': AC3_Temp,
+                'AC3_Speed': AC3_Speed
+            }
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/AC3_Control",
+            data: data
+        });
+    }
+    function AC4_BUTTON() {
+        
+        var AC4_OnOff = document.getElementById('AC4_OnOff').value;
+        var AC4_Temp = document.getElementById('AC4_Temp').value;
+        var AC4_Speed = document.getElementById('AC4_Speed').value;
+        //
+        var NowOnOff, NowSpeed;
+        if (AC4_OnOff == "0") { // 開關機
+            NowOnOff = "OFF";
+        }
+        else if (AC4_OnOff == "1") {
+            NowOnOff = "ON";
+        }
+
+        if (AC4_Speed == 7 || AC4_Speed == 5) { // 風量
+            NowSpeed = "自動";
+        }
+        else if (AC4_Speed == 1) {
+            NowSpeed = "微風";
+        }
+        else if (AC4_Speed == 3) {
+            NowSpeed = "弱風";
+        }
+        else if (AC4_Speed == 4) {
+            NowSpeed = "強風";
+        }
+
+
+        document.getElementById('Now_AC4_OnOff').innerHTML = NowOnOff; // 儲存設定->即時顯示
+        document.getElementById('Now_AC4_Temp').innerHTML = AC4_Temp + " °C";
+        document.getElementById('Now_AC4_Speed').innerHTML = NowSpeed;
+
+        //
+        let data = {
+            data: {
+                'AC4_OnOff': AC4_OnOff,
+                'AC4_Temp': AC4_Temp,
+                'AC4_Speed': AC4_Speed
+            }
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/AC4_Control",
+            data: data
+        });
+    }
+    function AC5_BUTTON() {
+
+        var AC5_OnOff = document.getElementById('AC5_OnOff').value;
+        var AC5_Temp = document.getElementById('AC5_Temp').value;
+        var AC5_Speed = document.getElementById('AC5_Speed').value;
+        //
+        var NowOnOff, NowSpeed;
+        if (AC5_OnOff == "0") { // 開關機
+            NowOnOff = "OFF";
+        }
+        else if (AC5_OnOff == "1") {
+            NowOnOff = "ON";
+        }
+
+        if (AC5_Speed == 7 || AC5_Speed == 5) { // 風量
+            NowSpeed = "自動";
+        }
+        else if (AC5_Speed == 1) {
+            NowSpeed = "微風";
+        }
+        else if (AC5_Speed == 3) {
+            NowSpeed = "弱風";
+        }
+        else if (AC5_Speed == 4) {
+            NowSpeed = "強風";
+        }
+
+        document.getElementById('Now_AC5_OnOff').innerHTML = NowOnOff; // 儲存設定->即時顯示
+        document.getElementById('Now_AC5_Temp').innerHTML = AC5_Temp + " °C";
+        document.getElementById('Now_AC5_Speed').innerHTML = NowSpeed;
+
+        //
+        let data = {
+            data: {
+                'AC5_OnOff': AC5_OnOff,
+                'AC5_Temp': AC5_Temp,
+                'AC5_Speed': AC5_Speed
+            }
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/AC5_Control",
+            data: data
+        });
+    }
+    function AC6_BUTTON() {
+
+        var AC6_OnOff = document.getElementById('AC6_OnOff').value;
+        var AC6_Temp = document.getElementById('AC6_Temp').value;
+        var AC6_Speed = document.getElementById('AC6_Speed').value;
+        //
+        var NowOnOff, NowSpeed;
+        if (AC6_OnOff == "0") { // 開關機
+            NowOnOff = "OFF";
+        }
+        else if (AC6_OnOff == "1") {
+            NowOnOff = "ON";
+        }
+
+        if (AC6_Speed == 7 || AC6_Speed == 5) { // 風量
+            NowSpeed = "自動";
+        }
+        else if (AC6_Speed == 1) {
+            NowSpeed = "微風";
+        }
+        else if (AC6_Speed == 3) {
+            NowSpeed = "弱風";
+        }
+        else if (AC6_Speed == 4) {
+            NowSpeed = "強風";
+        }
+
+        document.getElementById('Now_AC6_OnOff').innerHTML = NowOnOff; // 儲存設定->即時顯示
+        document.getElementById('Now_AC6_Temp').innerHTML = AC6_Temp + " °C";
+        document.getElementById('Now_AC6_Speed').innerHTML = NowSpeed;
+
+        //
+        let data = {
+            data: {
+                'AC6_OnOff': AC6_OnOff,
+                'AC6_Temp': AC6_Temp,
+                'AC6_Speed': AC6_Speed
+            }
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Home/AC6_Control",
+            data: data
+        });
+    }
+
+</script >
+
+<script>
+    $.ajax({ // 撈SQL資料
+        type: "POST",//Request type
+        dataType: "json",//把從後台撈到的資料轉換成預期的資料類型
+        url: "/Home/HistoryVal",
+        success: function (data) {//success: function(response){ 請求成功後，function(data)會被呼叫，data代表從後台撈到的資料
+            
+            var OperationAC1 = data[0].OperationAC1; // 1號冷氣
+            var TempAC1 = data[0].TempAC1;
+            var SpeedAC1 = data[0].SpeedAC1;
+
+            if (OperationAC1 == 0) { // 開關機
+                OperationAC1 = "OFF";
+            }
+            else if (OperationAC1 == 1) {
+                OperationAC1 = "ON";
+            }
+
+            if (SpeedAC1 == 7) { // 風量
+                SpeedAC1 = "自動";
+            }
+            else if (SpeedAC1 == 1) {
+                SpeedAC1 = "微風";
+            }
+            else if (SpeedAC1 == 3) {
+                SpeedAC1 = "弱風";
+            }
+            else if (SpeedAC1 == 4) {
+                SpeedAC1 = "強風";
+            } else if (SpeedAC1 == 5) {
+                SpeedAC1 = "自動";
+            }
+
+            TempAC1 += " °C"; // 溫度
+
+            document.getElementById("Now_AC1_OnOff").innerHTML = OperationAC1;
+            document.getElementById("Now_AC1_Temp").innerHTML = TempAC1;
+            document.getElementById("Now_AC1_Speed").innerHTML = SpeedAC1;
+
+            var OperationAC2 = data[0].OperationAC2; // 2號冷氣
+            var TempAC2 = data[0].TempAC2;
+            var SpeedAC2 = data[0].SpeedAC2;
+
+            if (OperationAC2 == 0) { // 開關機
+                OperationAC2 = "OFF";
+            }
+            else if (OperationAC2 == 1) {
+                OperationAC2 = "ON";
+            }
+
+            if (SpeedAC2 == 7) { // 風量
+                SpeedAC2 = "自動";
+            }
+            else if (SpeedAC2 == 1) {
+                SpeedAC2 = "微風";
+            }
+            else if (SpeedAC2 == 3) {
+                SpeedAC2 = "弱風";
+            }
+            else if (SpeedAC2 == 4) {
+                SpeedAC2 = "強風";
+            } else if (SpeedAC2 == 5) {
+                SpeedAC2 = "自動";
+            }
+
+            TempAC2 += " °C"; // 溫度
+
+            document.getElementById("Now_AC2_OnOff").innerHTML = OperationAC2;
+            document.getElementById("Now_AC2_Temp").innerHTML = TempAC2;
+            document.getElementById("Now_AC2_Speed").innerHTML = SpeedAC2;
+
+
+            var OperationAC3 = data[0].OperationAC3; // 1號冷氣
+            var TempAC3 = data[0].TempAC3;
+            var SpeedAC3 = data[0].SpeedAC3;
+
+            if (OperationAC3 == 0) { // 開關機
+                OperationAC3 = "OFF";
+            }
+            else if (OperationAC3 == 1) {
+                OperationAC3 = "ON";
+            }
+
+            if (SpeedAC3 == 7) { // 風量
+                SpeedAC3 = "自動";
+            }
+            else if (SpeedAC3 == 1) {
+                SpeedAC3 = "微風";
+            }
+            else if (SpeedAC3 == 3) {
+                SpeedAC3 = "弱風";
+            }
+            else if (SpeedAC3 == 4) {
+                SpeedAC3 = "強風";
+            } else if (SpeedAC3 == 5) {
+                SpeedAC3 = "自動";
+            }
+
+            TempAC3 += " °C"; // 溫度
+
+            document.getElementById("Now_AC3_OnOff").innerHTML = OperationAC3;
+            document.getElementById("Now_AC3_Temp").innerHTML = TempAC3;
+            document.getElementById("Now_AC3_Speed").innerHTML = SpeedAC3;
+
+            var OperationAC4 = data[0].OperationAC4; // 4號冷氣
+            var TempAC4 = data[0].TempAC4;
+            var SpeedAC4 = data[0].SpeedAC4;
+
+            if (OperationAC4 == 0) { // 開關機
+                OperationAC4 = "OFF";
+            }
+            else if (OperationAC4 == 1) {
+                OperationAC4 = "ON";
+            }
+
+            if (SpeedAC4 == 7) { // 風量
+                SpeedAC4 = "自動";
+            }
+            else if (SpeedAC4 == 1) {
+                SpeedAC4 = "微風";
+            }
+            else if (SpeedAC4 == 3) {
+                SpeedAC4 = "弱風";
+            }
+            else if (SpeedAC4 == 4) {
+                SpeedAC4 = "強風";
+            } else if (SpeedAC4 == 5) {
+                SpeedAC4 = "自動";
+            }
+
+            TempAC4 += " °C"; // 溫度
+
+            document.getElementById("Now_AC4_OnOff").innerHTML = OperationAC4;
+            document.getElementById("Now_AC4_Temp").innerHTML = TempAC4;
+            document.getElementById("Now_AC4_Speed").innerHTML = SpeedAC4;
+
+            var OperationAC5 = data[0].OperationAC5; // 5號冷氣
+            var TempAC5 = data[0].TempAC5;
+            var SpeedAC5 = data[0].SpeedAC5;
+
+            if (OperationAC5 == 0) { // 開關機
+                OperationAC5 = "OFF";
+            }
+            else if (OperationAC5 == 1) {
+                OperationAC5 = "ON";
+            }
+
+            if (SpeedAC5 == 7) { // 風量
+                SpeedAC5 = "自動";
+            }
+            else if (SpeedAC5 == 1) {
+                SpeedAC5 = "微風";
+            }
+            else if (SpeedAC5 == 3) {
+                SpeedAC5 = "弱風";
+            }
+            else if (SpeedAC5 == 4) {
+                SpeedAC5 = "強風";
+            } else if (SpeedAC5 == 5) {
+                SpeedAC5 = "自動";
+            }
+
+            TempAC5 += " °C"; // 溫度
+
+            document.getElementById("Now_AC5_OnOff").innerHTML = OperationAC5;
+            document.getElementById("Now_AC5_Temp").innerHTML = TempAC5;
+            document.getElementById("Now_AC5_Speed").innerHTML = SpeedAC5;
+
+            var OperationAC6 = data[0].OperationAC6; // 1號冷氣
+            var TempAC6 = data[0].TempAC6;
+            var SpeedAC6 = data[0].SpeedAC6;
+
+            if (OperationAC6 == 0) { // 開關機
+                OperationAC6 = "OFF";
+            }
+            else if (OperationAC6 == 1) {
+                OperationAC6 = "ON";
+            }
+            if (SpeedAC6 == 7) { // 風量
+                SpeedAC6 = "自動";
+            }
+            else if (SpeedAC6 == 1) {
+                SpeedAC6 = "微風";
+            }
+            else if (SpeedAC6 == 3) {
+                SpeedAC6 = "弱風";
+            }
+            else if (SpeedAC6 == 4) {
+                SpeedAC6 = "強風";
+            } else if (SpeedAC6 == 5) {
+                SpeedAC6 = "自動";
+            }
+
+            TempAC6 += " °C"; // 溫度
+
+            document.getElementById("Now_AC6_OnOff").innerHTML = OperationAC6;
+            document.getElementById("Now_AC6_Temp").innerHTML = TempAC6;
+            document.getElementById("Now_AC6_Speed").innerHTML = SpeedAC6;
+        } // ajax_success
+    });
+
+</script>

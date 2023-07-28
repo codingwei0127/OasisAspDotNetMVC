@@ -1,0 +1,437 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">hvac</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">空調系統查詢</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    起始時間：
+                    <input type="text" class="form-control datepicker" value="" id="start" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    結束時間：
+                    <input type="text" class="form-control datepicker" value="" id="end" style="font-weight:bold;color:#013d66;text-align:center;">
+                    &nbsp;&nbsp;&nbsp;
+                    設備類型：
+                    <select class="selectpicker" data-size="6" data-style="btn btn-info btn-fill" title="請選擇設備類型" id="equipmentType">
+                        <option disabled="disabled" selected="selected">請選擇設備類型</option>
+                        <option value="Chiller">冰水主機</option>
+                        <option value="CHPump">冰水泵浦</option>
+                        <option value="CWPump">冷卻水泵浦</option>
+                        <option value="ZPump">區域泵浦</option>
+                        <option value="CTower">冷卻水塔</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    設備編號：
+                    <select class="selectpicker" data-size="5" data-style="btn btn-info btn-fill" data-live-search="true" title="請選擇設備" id="equipmentID">
+                        <option disabled="disabled">請選擇設備</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button onclick="ACHistorySearch()" id="SearchButton" type="button" class="btn btn-fill btn-sm btn-warning" style="font-weight:bold;margin-top:5px;margin-bottom:9px;">查詢</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="ACHistoryReport()" id="OutputButton" type="button" class="btn btn-fill btn-success SearchSuccess" style="font-weight:bold;margin-top:5px;margin-bottom:9px;display:none;">輸出成Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div id="downloadfile"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row SearchSuccess" id="SearchDIV" style="display:none;">
+    <div class="col-md-12">
+        <table class="col-md-12" id="Table_ACHistory">
+            <thead id="TableThead">
+            </thead>
+            <tbody id="TableTbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    document.getElementById("SysSearchTitle").classList.add("active");
+    document.getElementById("SysSearch").classList.add("show");
+    document.getElementById("ACHistory").classList.add("active");
+    $(document).ready(function () {
+        // initialise Datetimepicker and Sliders
+        md.initFormExtendedDatetimepickers();
+        if ($('.slider').length != 0) {
+            md.initSliders();
+        }
+        $("#start").datepicker("setDate", new Date());
+        $('#end').datepicker("setDate", new Date());
+    });
+
+    $('#equipmentType').on('change', function () {
+        if ($('#equipmentType option:selected').val() == "Chiller") {
+            $('#equipmentID option').remove();
+            $('#equipmentID').append($('<option disabled="disabled" selected="selected">請選擇設備</option>'));
+            $('#equipmentID').append($('<option value="CH1">CH1</option>'));
+            $('#equipmentID').append($('<option value="CH2">CH2</option>)'));
+            $('#equipmentID').append($('<option value="CH3">CH3</option>)'));
+            $('#equipmentID').append($('<option value="CHSP">CHSP</option>)'));
+            $('.selectpicker').selectpicker('refresh');
+        }
+        else if ($('#equipmentType option:selected').val() == "CHPump") {
+            $('#equipmentID option').remove();
+            $('#equipmentID').append($('<option disabled="disabled" selected="selected">請選擇設備</option>'));
+            $('#equipmentID').append($('<option value="CHP1">CHP1</option>)'));
+            $('#equipmentID').append($('<option value="CHP2">CHP2</option>)'));
+            $('#equipmentID').append($('<option value="CHP3">CHP3</option>)'));
+            $('#equipmentID').append($('<option value="CHPSP">CHPSP</option>)'));
+            $('.selectpicker').selectpicker('refresh');
+        }
+        else if ($('#equipmentType option:selected').val() == "CWPump") {
+            $('#equipmentID option').remove();
+            $('#equipmentID').append($('<option disabled="disabled" selected="selected">請選擇設備</option>'));
+            $('#equipmentID').append($('<option value="CWP1">CWP1</option>)'));
+            $('#equipmentID').append($('<option value="CWP2">CWP2</option>)'));
+            $('#equipmentID').append($('<option value="CWP3">CWP3</option>)'));
+            $('#equipmentID').append($('<option value="CWPSP">CWPSP</option>)'));
+            $('.selectpicker').selectpicker('refresh');
+        }
+        else if ($('#equipmentType option:selected').val() == "ZPump") {
+            $('#equipmentID option').remove();
+            $('#equipmentID').append($('<option disabled="disabled" selected="selected">請選擇設備</option>'));
+            $('#equipmentID').append($('<option value="ZP1">ZP1</option>)'));
+            $('#equipmentID').append($('<option value="ZP2">ZP2</option>)'));
+            $('#equipmentID').append($('<option value="ZP3">ZP3</option>)'));
+            $('#equipmentID').append($('<option value="ZPSP">ZPSP</option>)'));
+            $('.selectpicker').selectpicker('refresh');
+        }
+        else if ($('#equipmentType option:selected').val() == "CTower") {
+            $('#equipmentID option').remove();
+            $('#equipmentID').append($('<option disabled="disabled" selected="selected">請選擇設備</option>'));
+            $('#equipmentID').append($('<option value="CT1">CT1</option>)'))
+            $('#equipmentID').append($('<option value="CT2">CT2</option>)'))
+            $('#equipmentID').append($('<option value="CT3">CT3</option>)'))
+            $('#equipmentID').append($('<option value="CT4">CT4</option>)'))
+            $('#equipmentID').append($('<option value="CT5">CT5</option>)'))
+            $('#equipmentID').append($('<option value="CT6">CT6</option>)'))
+            $('#equipmentID').append($('<option value="CT7">CT7</option>)'))
+            $('#equipmentID').append($('<option value="CT8">CT8</option>)'))
+            $('.selectpicker').selectpicker('refresh');
+        }
+    });
+
+    function ACHistorySearch() {
+        var startdate = document.getElementById("start").value;
+        const startarray = startdate.split("/");
+        var startdateSQL = startarray[2] + "-" + startarray[0] + "-" + startarray[1];
+        var enddate = document.getElementById("end").value;
+        const endarray = enddate.split("/");
+        var enddateSQL = endarray[2] + "-" + endarray[0] + "-" + endarray[1];
+        var equipmentType = document.getElementById("equipmentType").value;
+        var equipmentID = document.getElementById("equipmentID").value;
+        if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined" && equipmentType == "請選擇設備類型" && equipmentID == "請選擇設備") {
+            alert("請選取開始、結束時間及欲查詢的設備類型、設備");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined" && equipmentType == "請選擇設備類型") {
+            alert("請選取開始、結束時間及欲查詢的設備類型");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined" && equipmentID == "請選擇設備") {
+            alert("請選取開始、結束時間及欲查詢的設備");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined" && equipmentType == "請選擇設備類型" && equipmentID == "請選擇設備") {
+            alert("請選取開始時間及欲查詢的設備類型、設備");
+            return
+        }
+        else if (enddateSQL == "undefined--undefined" && equipmentType == "請選擇設備類型" && equipmentID == "請選擇設備") {
+            alert("請選取結束時間及欲查詢的設備類型、設備");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined" && enddateSQL == "undefined--undefined") {
+            alert("請選取開始、結束時間");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined" && equipmentType == "請選擇設備類型") {
+            alert("請選取開始及欲查詢的設備類型");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined" && equipmentID == "請選擇設備") {
+            alert("請選取開始及欲查詢的設備");
+            return
+        }
+        else if (enddateSQL == "undefined--undefined" && equipmentType == "請選擇設備類型") {
+            alert("請選取結束時間及欲查詢的設備類型");
+            return
+        }
+        else if (enddateSQL == "undefined--undefined" && equipmentID == "請選擇設備") {
+            alert("請選取結束時間及欲查詢的設備");
+            return
+        }
+        else if (equipmentType == "請選擇設備類型" && equipmentID == "請選擇設備") {
+            alert("請選取欲查詢的設備類型、設備");
+            return
+        }
+        else if (startdateSQL == "undefined--undefined") {
+            alert("請選取開始時間");
+            return
+        }
+        else if (enddateSQL == "undefined--undefined") {
+            alert("請選取結束時間");
+            return
+        }
+        else if (equipmentType == "請選擇設備類型") {
+            alert("請選取欲查詢的設備類型");
+            return
+        }
+        else if (equipmentID == "請選擇設備") {
+            alert("請選取欲查詢的設備");
+            return
+        }
+        let data = {
+            data: {
+                'startdateSQL': startdateSQL,
+                'enddateSQL': enddateSQL,
+                'equipmentType': equipmentType,
+                'equipmentID': equipmentID,
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Search/ACHistorySearch",
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Search_success");
+                $('.SearchSuccess').show();
+                $('#TableThead>tr').remove();
+                $('#TableTbody>tr').remove();
+                //append Thead and Tbody
+                //Chiller
+                if (equipmentType == "Chiller") {
+                    $('#TableThead').append(
+                        '<tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">' +
+                        '<th>時間</th>' +
+                        '<th>設備編號</th>' +
+                        '<th>用電需量(kW)</th>' +
+                        '<th>冰水出水溫度(℃)</th>' +
+                        '<th>冰水回水溫度(℃)</th>' +
+                        '<th>冷卻水出水溫度(℃)</th>' +
+                        '<th>冷卻水回水溫度(℃)</th>' +
+                        '<th>冰水流量(LPM)</th></tr>'
+                    );
+                    for (var i = 0; i < data[0].Time.length; i++) {
+                        if (i % 2 == 0) {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].kW[i] + '">' + parseFloat(data[0].kW[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td>' +
+                                '<td value="' + data[0].Tchwout[i] + '">' + parseFloat(data[0].Tchwout[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].Tchwin[i] + '">' + parseFloat(data[0].Tchwin[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].Tcwout[i] + '">' + parseFloat(data[0].Tcwout[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].Tcwin[i] + '">' + parseFloat(data[0].Tcwin[i]).toFixed(2) + '</td>'+
+                                '<td value="' + data[0].CHFlow[i] + '">' + parseFloat(data[0].CHFlow[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td></tr>'
+                            );
+                        }
+                        else {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].kW[i] + '">' + parseFloat(data[0].kW[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td>' +
+                                '<td value="' + data[0].Tchwout[i] + '">' + parseFloat(data[0].Tchwout[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].Tchwin[i] + '">' + parseFloat(data[0].Tchwin[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].Tcwout[i] + '">' + parseFloat(data[0].Tcwout[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].Tcwin[i] + '">' + parseFloat(data[0].Tcwin[i]).toFixed(2) + '</td>' +
+                                '<td value="' + data[0].CHFlow[i] + '">' + parseFloat(data[0].CHFlow[i]).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '</td></tr>'
+                            );
+                        }
+                    }
+                }
+                //CHPump
+                else if (equipmentType == "CHPump") {
+                    $('#TableThead').append(
+                        '<tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">' +
+                        '<th class="col-md-3">時間</th>' +
+                        '<th class="col-md-3">設備編號</th>' +
+                        '<th class="col-md-3">狀態</th>' +
+                        '<th class="col-md-3">運轉頻率(Hz)</th></tr>'
+                    );
+                    for (var i = 0; i < data[0].Time.length; i++) {
+                        if (i % 2 == 0) {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].CHPstatus[i] + '" style="color:' + data[0].CHPcolor[i] + ';">' + data[0].CHPstatus[i] + '</td>' +
+                                '<td value="' + data[0].CHPf[i] + '">' + parseFloat(data[0].CHPf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                        else {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].CHPstatus[i] + '" style="color:' + data[0].CHPcolor[i] + ';">' + data[0].CHPstatus[i] + '</td>' +
+                                '<td value="' + data[0].CHPf[i] + '">' + parseFloat(data[0].CHPf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                    }
+                }
+                //CWPump
+                else if (equipmentType == "CWPump") {
+                    $('#TableThead').append(
+                        '<tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">' +
+                        '<th class="col-md-3">時間</th>' +
+                        '<th class="col-md-3">設備編號</th>' +
+                        '<th class="col-md-3">狀態</th>' +
+                        '<th class="col-md-3">運轉頻率(Hz)</th></tr>'
+                    );
+                    for (var i = 0; i < data[0].Time.length; i++) {
+                        if (i % 2 == 0) {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].CWPstatus[i] + '" style="color:' + data[0].CWPcolor[i] + ';">' + data[0].CWPstatus[i] + '</td>' +
+                                '<td value="' + data[0].CWPf[i] + '">' + parseFloat(data[0].CWPf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                        else {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].CWPstatus[i] + '" style="color:' + data[0].CWPcolor[i] + ';">' + data[0].CWPstatus[i] + '</td>' +
+                                '<td value="' + data[0].CWPf[i] + '">' + parseFloat(data[0].CWPf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                    }
+                }
+                //ZPump
+                else if (equipmentType == "ZPump") {
+                    $('#TableThead').append(
+                        '<tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">' +
+                        '<th class="col-md-3">時間</th>' +
+                        '<th class="col-md-3">設備編號</th>' +
+                        '<th class="col-md-3">狀態</th>' +
+                        '<th class="col-md-3">運轉頻率(Hz)</th></tr>'
+                    );
+                    for (var i = 0; i < data[0].Time.length; i++) {
+                        if (i % 2 == 0) {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].ZPstatus[i] + '" style="color:' + data[0].ZPcolor[i] + ';">' + data[0].ZPstatus[i] + '</td>' +
+                                '<td value="' + data[0].ZPf[i] + '">' + parseFloat(data[0].ZPf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                        else {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].ZPstatus[i] + '" style="color:' + data[0].ZPcolor[i] + ';">' + data[0].ZPstatus[i] + '</td>' +
+                                '<td value="' + data[0].ZPf[i] + '">' + parseFloat(data[0].ZPf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                    }
+                }
+                //CTower
+                else if (equipmentType == "CTower") {
+                    $('#TableThead').append(
+                        '<tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;font-weight:bold;text-align:center;height:40px;">' +
+                        '<th class="col-md-3">時間</th>' +
+                        '<th class="col-md-3">設備編號</th>' +
+                        '<th class="col-md-3">狀態</th>' +
+                        '<th class="col-md-3">運轉頻率(Hz)</th></tr>'
+                    );
+                    for (var i = 0; i < data[0].Time.length; i++) {
+                        if (i % 2 == 0) {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#FAFAFA;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].CTstatus[i] + '" style="color:' + data[0].CTcolor[i] + ';">' + data[0].CTstatus[i] + '</td>' +
+                                '<td value="' + data[0].CTf[i] + '">' + parseFloat(data[0].CTf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                        else {
+                            $('#TableTbody').append(
+                                '<tr style="background-color:#EEEEEE;height:40px;text-align:center;">' +
+                                '<td value="' + data[0].Time[i] + '">' + data[0].Time[i] + '</td><td value="' + equipmentID + '">' + equipmentID + '</td>' +
+                                '<td value="' + data[0].CTstatus[i] + '" style="color:' + data[0].CTcolor[i] + ';">' + data[0].CTstatus[i] + '</td>' +
+                                '<td value="' + data[0].CTf[i] + '">' + parseFloat(data[0].CTf[i]).toFixed(2) + '</td></tr>'
+                            );
+                        }
+                    }
+                }
+            },
+            error: function (res) {
+                console.log('Search_false');
+            }
+        });
+        //Table Hover Event
+        var originColor;
+        $("#TableTbody > tr").hover(function () {
+            originColor = this.style.backgroundColor;
+            this.style.backgroundColor = '#f8e7aa';
+        }, function () {
+            this.style.backgroundColor = originColor;
+        });
+    };
+
+    function ACHistoryReport() {
+        var thead = document.getElementById("TableThead");
+        var theadcols = thead.rows[0].cells.length;
+        var tbody = document.getElementById("TableTbody");
+        var tbodyrows = tbody.rows.length;
+        var tbodycols = tbody.rows[0].cells.length;
+        var TheadContent = [];
+        var TbodyContent = [];
+        for (i = 0; i < theadcols; i++) {
+            TheadContent.push(thead.rows[0].cells[i].innerHTML);
+        }
+        for (var i = 0; i < tbodyrows; i++) {
+            for (j = 0; j < tbodycols; j++) {
+                //TbodyContent.push(tbody.rows[i].cells[j].innerHTML);
+                TbodyContent.push(tbody.rows[i].cells[j].getAttribute("value"));
+            }
+        }
+        //var equipmentID = document.getElementById("equipmentID").value;
+        var equipmentID = tbody.rows[0].cells[1].innerHTML;
+        var allArrays = [TbodyContent, TheadContent];
+        let data = {
+            data: {
+                'outputType': 'ACHistory',
+                'theadcols': theadcols,
+                'tbodyrows': tbodyrows,
+                'tbodycols': tbodycols,
+                'equipmentID': equipmentID,
+            },
+            allArrays: allArrays,
+        }
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional: true,
+            url: "/Home/OutputTableReport",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Output_success");
+                Swal.fire('報表輸出成功', '', 'success');
+                $('#OutputReport').show();
+                document.getElementById("downloadfile").innerHTML = '';
+                $('#downloadfile').append(
+                    '<br/><label>' + data[0].filename + '<label>&nbsp;&nbsp;&nbsp;<a href="/AllReport/ACHistoryReport/' + data[0].filename + '" download = "' + data[0].filename + '"><button type="button" class="btn btn-success btn-sm">下載</button></a>'
+                );
+            },
+            error: function (result) {
+                console.log("Output_false");
+            }
+        });
+    };
+</script>

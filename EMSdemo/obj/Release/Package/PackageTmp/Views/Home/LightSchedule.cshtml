@@ -1,0 +1,868 @@
+﻿
+@{
+    ViewBag.Title = "LightSchedule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*head標籤*@
+<head>
+    <style>
+        .bootstrap-select > .dropdown-toggle {
+            position: relative;
+            width: 40%;
+            z-index: 1;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .bootstrap-select .dropdown-toggle .filter-option {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding-top: inherit;
+            padding-right: inherit;
+            padding-bottom: inherit;
+            padding-left: inherit;
+            height: 100%;
+            width: 125%;
+            text-align: left;
+            display: inline;
+        }
+
+        .bootstrap-select:not(.input-group-btn),
+        .bootstrap-select[class*="col-"] {
+            float: none;
+            margin-left: 0;
+            display: inline;
+        }
+    </style>
+</head>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">dvr</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">照明工作排程系統</h4>
+            </div>
+            <div class="card-body">
+
+
+  
+
+                    <div class="col-md-12 tab-pane active table-responsive" id="LIGHT">
+                        <div class="row">
+                            <table class="col-md-12" id="Table_CH" style="font-weight:bold;text-align:center;color:black;">
+                                <thead>
+                                    <tr style="background-color:#036EB7;border-bottom:2px #000000 solid;border-top:2px #000000 solid;color:white;height:40px;">
+                                        <th class="col-md-3"></th>
+                                        <th class="col-md-2">目前設定開機時間</th>
+                                        <th class="col-md-2">目前設定關機時間</th>
+                                        <th class="col-md-2">設定開機時間</th>
+                                        <th class="col-md-2">設定關機時間</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td style="background-color:#b2dbf7;">星期日</td>
+                                        <td id="number7_W1OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W1ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_0" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_1" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_2" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_3" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#FAFAFA;height:40px;">
+                                        <td style="background-color:#e3f4ff;">星期一</td>
+                                        <td id="number7_W2OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W2ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_4" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_5" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_6" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_7" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td style="background-color:#b2dbf7;">星期二</td>
+                                        <td id="number7_W3OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W3ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_8" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_9" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_10" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_11" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#FAFAFA;height:40px;">
+                                        <td style="background-color:#e3f4ff;">星期三</td>
+                                        <td id="number7_W4OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W4ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_12" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_13" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_14" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_15" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td style="background-color:#b2dbf7;">星期四</td>
+                                        <td id="number7_W5OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W5ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_16" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_17" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_18" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_19" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#FAFAFA;height:40px;">
+                                        <td style="background-color:#e3f4ff;">星期五</td>
+                                        <td id="number7_W6OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W6ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_20" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_21" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_22" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_23" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#EEEEEE;height:40px;">
+                                        <td style="background-color:#b2dbf7;">星期六</td>
+                                        <td id="number7_W7OP" style="font-size:20px">2022-4-5 上午09:00</td>
+                                        <td id="number7_W7ED" style="font-size:20px">2022-4-5 下午20:00</td>
+                                        <td>
+
+                                            <select id="number7_select_24" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_25" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                        <td>
+
+                                            <select id="number7_select_26" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+
+                                            </select>
+
+                                            點
+                                            <select id="number7_select_27" class="selectpicker" data-size="5" data-style="btn btn-info btn-fill">
+
+                                                <option value="0">0</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                            </select>
+
+                                            分
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-info btn-sm" onclick="Button()">儲存設定</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var INSERTSQL_ACTION = "";
+    // SQL排程
+
+    function Button() { // 1號冷氣排程
+        INSERTSQL_ACTION = "燈具";
+
+        var SQL_array = new Array();
+        var SQL_string = "";
+
+        // number7_select_0 ~ number7_select_27
+        for (let i = 0; i <= 27; i++) {
+            SQL_string = "number7_select_" + i;
+            SQL_array[i] = document.getElementById(SQL_string).value;
+        }
+        SQL_array[28] = INSERTSQL_ACTION;
+
+        for (let x = 1; x <= 7; x++) {  // set完作即時顯示( [0] ~ [27])
+            let stringOP = "number7_W" + x + "OP";
+            let stringED = "number7_W" + x + "ED";
+
+            // 0~27
+            let setOP_Hour = "number7_select_" + (x * 4 - 4);
+            let setOP_Min = "number7_select_" + (x * 4 - 3);
+            let setED_Hour = "number7_select_" + (x * 4 - 2);
+            let setED_Min = "number7_select_" + (x * 4 - 1);
+
+            ddl1 = document.getElementById(setOP_Hour);
+            ddl2 = document.getElementById(setOP_Min);
+            ddl3 = document.getElementById(setED_Hour);
+            ddl4 = document.getElementById(setED_Min);
+
+            document.getElementById(stringOP).innerHTML = ddl1.value + " 點 " + ddl2.value + " 分 ";
+            document.getElementById(stringED).innerHTML = ddl3.value + " 點 " + ddl4.value + " 分 ";
+        }
+
+
+        let data = {
+            data: {
+                'start': SQL_array.toString(),
+            }
+        }
+
+        $.ajax({
+            //緩存
+            cache: false,
+            //同步
+            async: false,
+            //請求資料的方式
+            type: "POST",
+            //server回傳數據的資料類型
+            dataType: "json",
+            //contentType: "application/json; charset=utf-8",
+            url: "/Home/schedule",
+            //data: data,
+            data: data,
+
+            success: function (data) {
+            },
+            error: function (result) {
+            }
+        });
+    }
+    // 重整顯示 -> 即時顯示 (目前設定開機時間 + 設定開機時間)
+    $.ajax({
+        cache: false,
+        async: false,
+        processData: true,
+        type: "POST",//Request type
+        dataType: "json",//把從後台撈到的資料轉換成預期的資料類型
+        contentType: "application/json; charset=utf-8",
+        url: "/Home/schedule_sql",
+        success: function (data) {//success: function(response){ 請求成功後，function(data)會被呼叫，data代表從後台撈到的資料
+
+            for (let x = 1; x <= 7; x++) {  // 星期一~星期日
+                let stringOP = "number7_W" + x + "OP";
+                let stringED = "number7_W" + x + "ED";
+                // 0~27
+                document.getElementById(stringOP).innerHTML = (data[0].Light_Time)[x * 4 - 4] + " 點 " + (data[0].Light_Time)[x * 4 - 3] + " 分 ";
+                document.getElementById(stringED).innerHTML = (data[0].Light_Time)[x * 4 - 2] + " 點 " + (data[0].Light_Time)[x * 4 - 1] + " 分 ";
+
+                let setOP_Hour = "number7_select_" + (x * 4 - 4);
+                let setOP_Min = "number7_select_" + (x * 4 - 3);
+                let setED_Hour = "number7_select_" + (x * 4 - 2);
+                let setED_Min = "number7_select_" + (x * 4 - 1);
+
+                ddl1 = document.getElementById(setOP_Hour);
+                ddl2 = document.getElementById(setOP_Min);
+                ddl3 = document.getElementById(setED_Hour);
+                ddl4 = document.getElementById(setED_Min);
+
+                ddl1.value = (data[0].Light_Time)[x * 4 - 4];
+                ddl2.value = (data[0].Light_Time)[x * 4 - 3];
+                ddl3.value = (data[0].Light_Time)[x * 4 - 2];
+                ddl4.value = (data[0].Light_Time)[x * 4 - 1];
+            }
+        },
+        error: function (result) {//Error Method
+        }
+    });
+
+</script>

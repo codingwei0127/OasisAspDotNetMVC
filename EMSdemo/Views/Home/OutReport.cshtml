@@ -1,0 +1,156 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">list_alt</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">用電報表輸出</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <div class="input-group col-md-2" id="SelectMonthDiv"></div>
+                    <button onclick="OutReport()" id="OutputButton" type="button" class="btn btn-fill btn-success" style="font-weight:bold;">用電報表輸出Excel</button>
+                </div>
+                <div class="row" id="OutputReport" style="display:none;">
+                    <label class="col-md-1"></label>
+                    <div id="downloadfile"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="background-color: #ffffff;">
+            <div class="card-header card-header-icon card-header-info">
+                <div class="card-icon">
+                    <i class="material-icons">list_alt</i>
+                </div>
+                <h4 class="card-title" style="font-weight:bold;color:#013d66">冰水主機群組系統能源效率報表</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-1"></label>
+                    <div class="input-group col-md-2" id="SelectYearDiv"></div>
+                    <button onclick="OutGovReport('Excel')" id="GovExcelButton" type="button" class="btn btn-fill btn-success" style="font-weight:bold;">輸出Excel</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button onclick="OutGovReport('Word')" id="GovWordButton" type="button" class="btn btn-fill btn-success" style="font-weight:bold;">輸出Word</button>
+                </div>
+                <div class="row" id="OutputGovReport" style="display:none;">
+                    <label class="col-md-1"></label>
+                    <div id="downloadgovfile"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("OutReport").classList.add("active");
+    $(document).ready(function () {
+        $().ready(function () {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                url: "/Home/OutReportVal",
+                success: function (data) {
+                    console.log("LoadData_success");
+                    var optionstring = "";
+                    for (var i = 0; i < data[0].Month.length; i++) optionstring = optionstring + '<option value="' + data[0].Month[i] + '">' + data[0].Month[i] + '</option>';
+                    $("#SelectMonthDiv").append(
+                        '<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年月份" data-size="8" id="SearchMonth"><option disabled="disabled" selected="selected">請選擇年月份</option>' + optionstring + '</select>'
+                    );
+                    $('.selectpicker').selectpicker('render');
+                    var govoptionstring = "";
+                    for (var i = 0; i < data[0].Year.length; i++) govoptionstring = govoptionstring + '<option value="' + data[0].Year[i] + '">' + data[0].Year[i] + '</option>';
+                    $("#SelectYearDiv").append(
+                        '<select class="selectpicker" data-style="btn btn-info" data-live-search="true" title="請選擇年份" data-size="8" id="SearchYear"><option disabled="disabled" selected="selected">請選擇年份</option>' + govoptionstring + '</select>'
+                    );
+                    $('.selectpicker').selectpicker('render');
+                },
+                error: function (result) {
+                    console.log("LoadData_false");
+                }
+            });
+        });
+    });
+
+    function OutReport() {
+        var SearchMonth = document.getElementById("SearchMonth").value;
+        if (SearchMonth == "請選擇年月份") {
+            alert("請選擇欲輸出的年月份");
+            return
+        }
+        let data = {
+            data: {
+                'SearchMonth': SearchMonth,
+            }
+        }
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional: true,
+            url: "/Home/OutExcel",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Output_success");
+                Swal.fire('報表輸出成功', '', 'success');
+                $('#OutputReport').show();
+                document.getElementById("downloadfile").innerHTML = '';
+                $('#downloadfile').append(
+                    '<br/><label>' + data[0].filename + '<label>&nbsp;&nbsp;&nbsp;<a href="/OutputReportExcel/' + data[0].filename + '" download = "' + data[0].filename + '"><button type="button" class="btn btn-success btn-sm">下載</button></a>'
+                );
+            },
+            error: function (result) {
+                console.log("Output_false");
+            }
+        });
+    };
+
+    function OutGovReport(e) {
+        var SearchYear = document.getElementById("SearchYear").value;
+        if (SearchYear == "請選擇年份") {
+            alert("請選擇欲輸出的年份");
+            return
+        }
+        let data = {
+            data: {
+                'SearchYear': SearchYear,
+                'FileType': e,
+            }
+        }
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional: true,
+            url: "/Home/OutEffFile",
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log("Output_success");
+                Swal.fire('報表輸出成功', '', 'success');
+                $('#OutputGovReport').show();
+                document.getElementById("downloadgovfile").innerHTML = '';
+                $('#downloadgovfile').append(
+                    '<br/><label>' + data[0].filename + '<label>&nbsp;&nbsp;&nbsp;<a href="/AllReport/ChillersEffWord/' + data[0].filename + '" download = "' + data[0].filename + '"><button type="button" class="btn btn-success btn-sm">下載</button></a>'
+                );
+            },
+            error: function (result) {
+                console.log("Output_false");
+            }
+        });
+    };
+</script>
